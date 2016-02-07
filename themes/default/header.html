@@ -1,0 +1,15 @@
+<nav>
+  <ul>
+    <li><a href="/">root</a></li>
+    $for(contents)$
+    <li>
+      <a href="/$contents.name$">$contents.name$</a>
+      <ul>
+	$for(contents.contents)$
+	<li><a href="/$contents.name$/$contents.contents.name$">$contents.contents.name$</a></li>
+	$endfor$
+      </ul>
+    </li>
+    $endfor$
+  </ul>
+</nav>
