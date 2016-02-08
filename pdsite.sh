@@ -1,10 +1,23 @@
+# TODO: Pick standard location? ~/.pdsite-themes?
 templatespath=~/Projects/pdsite/themes
 
-inputextension=.md
-outputfolder=.html
+# Set config defaults
 template=default
+inputextension=.md
+
+# Load config variables from file
+if [ -f ./.pdsite ]; then
+   # This isn't the best idea, but it works for now
+   # YAML would be ideal
+   source ./.pdsite
+else
+    echo "ERROR: .pdsite configuration file not detected" 1>&2
+    exit 1
+fi
 
 templatepath=$templatespath/$template
+treedata=tree.yaml
+stylesheet=styles.css
 
 # Convert to canonical path
 outputfolder=$(readlink -f $outputfolder)
@@ -25,23 +38,27 @@ find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type
 # Copy in index files
 find -not -path "*/\.*" -path "$indexfileglob"  -type f -exec cp {} $outputfolder/{} \;
 
-# Copy in other files
+# Copy in other content files
 find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type f | sed 's/\(.*\)\/\(.*\)'$inputextension'/\0 \1\/\2\/index'$inputextension'/' |  xargs -n 2 sh -c 'cp $0 '$outputfolder'/$1'
 
+# Move in CSS
+cp $templatepath/styles.css $outputfolder
+
 # Generate file structure for navigation templates
-echo -e '---\n' $(tree -dJ --noreport $outputfolder | cut -c 2-) '\n...' > $outputfolder/tree.yaml
+echo -e '---\n' $(tree -dJ --noreport $outputfolder | cut -c 2-) '\n...' > $outputfolder/$treedata
 
 # Generate header files
-find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -o header.html --template $templatepath/header.html $outputfolder/tree.yaml \;
+find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -o header.html --template $templatepath/header.html -V sitename="$sitename" $outputfolder/$treedata \;
 
 # Generate footer files
-find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -o footer.html --template $templatepath/footer.html $outputfolder/tree.yaml \;
+find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -o footer.html --template $templatepath/footer.html -V sitename="$sitename" $outputfolder/$treedata \;
 
 # Convert content files to HTML
-find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -B header.html -A footer.html -o index.html {} \; -delete
+find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -T "$sitename" -c "/$stylesheet" -B header.html -A footer.html -V sitename="$sitename" -o index.html {} \; -execdir rm header.html footer.html \; -delete
 
-# TODO: Copy in css/js/img
+# Clean up
+rm $outputfolder/$treedata
+
 echo " done."
 
-echo "Starting up server at localhost:8000..."
-webfsd -F -r $outputfolder -f index.html -l -
+webfsd -Fd -r $outputfolder -f index.html -l -
