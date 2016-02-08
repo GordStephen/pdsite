@@ -29,14 +29,13 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/">root</a></li>
 	    $for(contents)$
 	    $if(contents.contents)$
-            <li class="dropdown">
+            <li class="dropdown $for(contents.contents)$$if(contents.contents.active)$active$endif$$endfor$">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">$contents.name$ <span class="caret"></span></a>
               <ul class="dropdown-menu">
 		$for(contents.contents)$
-                <li><a href="/$contents.name$/$contents.contents.name$">$contents.contents.name$</a></li>
+                <li$if(contents.contents.active)$ class="active"$endif$><a href="$contents.contents.path$">$contents.contents.name$</a></li>
                 <!-- 3rd nested level? <li role="separator" class="divider"></li>
                 <li class="dropdown-header">Nav header</li>
                 <li><a href="#">One more separated link</a></li> -->
@@ -44,7 +43,7 @@
               </ul>
 	    </li>
 	    $else$
-	    <li><a href="/$contents.name$">$contents.name$</a></li>
+	    <li$if(contents.active)$ class="active"$endif$><a href="$contents.path$">$contents.name$</a></li>
 	    $endif$
 	  $endfor$
           </ul>

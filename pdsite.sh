@@ -16,11 +16,14 @@ else
 fi
 
 templatepath=$templatespath/$template
-treedata=tree.yaml
+treedata=tree.yaml.tmp
+localtreedata=localtree.yaml.tmp
+localfiledata=fileloc.tmp
 stylesheet=styles.css
 
 # Convert to canonical path
 outputfolder=$(readlink -f $outputfolder)
+escapedoutputfolder=$(echo $outputfolder | sed 's/\./\\./')
 
 # Build glob expressions
 extensionglob='*'$inputextension
@@ -45,19 +48,22 @@ find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type
 cp $templatepath/styles.css $outputfolder
 
 # Generate file structure for navigation templates
-echo -e '---\n' $(tree -dJ --noreport $outputfolder | cut -c 2-) '\n...' > $outputfolder/$treedata
+echo -e '---\n' $(tree -dfJ --noreport $outputfolder | cut -c 2- | sed 's|"name":"'$escapedoutputfolder'/\(.*\)/\(.*\)",|"name":"\2","path":"/\1/\2",|' | sed 's|"name":"'$escapedoutputfolder'/\(.*\)",|"name":"\1","path":"/\1",|') '\n...' > $outputfolder/$treedata
+
+# Generate structure supplement for each file
+find $outputfolder -path "$indexfileglob" -type f -execdir sh -c "pwd | sed 's|$escapedoutputfolder||' > $localfiledata" \; -execdir sh -c 'sed "s|\"path\":\"$(cat fileloc.tmp)\",|\0\"active\":y,|" '$outputfolder/$treedata' > '$localtreedata \;
 
 # Generate header files
-find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -o header.html --template $templatepath/header.html -V sitename="$sitename" $outputfolder/$treedata \;
+find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -o header.html --template $templatepath/header.html -V sitename="$sitename" $localtreedata \;
 
 # Generate footer files
-find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -o footer.html --template $templatepath/footer.html -V sitename="$sitename" $outputfolder/$treedata \;
+find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -o footer.html --template $templatepath/footer.html -V sitename="$sitename" $localtreedata \;
 
 # Convert content files to HTML
 find $outputfolder -path "$indexfileglob" -type f -execdir pandoc -T "$sitename" -c "/$stylesheet" -B header.html -A footer.html -V sitename="$sitename" -o index.html {} \; -execdir rm header.html footer.html \; -delete
 
 # Clean up
-rm $outputfolder/$treedata
+find $outputfolder -path "*.tmp" -type f -delete
 
 echo " done."
 
