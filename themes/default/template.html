@@ -13,7 +13,7 @@ $endif$
 $if(keywords)$
   <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$">
 $endif$
-  <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
+  <title>$if(pagetitle)$$pagetitle$$else$$pagename$$endif$ - $sitename$</title>
   <style type="text/css">code{white-space: pre;}</style>
 $if(quotes)$
   <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
@@ -23,18 +23,13 @@ $if(highlighting-css)$
 $highlighting-css$
   </style>
 $endif$
-$for(css)$
-  <link rel="stylesheet" href="$css$">
-$endfor$
+  <link rel="stylesheet" href="/styles.css">
 $if(math)$
   $math$
 $endif$
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
-$for(header-includes)$
-  $header-includes$
-$endfor$
 </head>
 <body>
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -73,7 +68,8 @@ $endfor$
     </nav>
 
     <div class="container">
-    $body$
+	$if(title)$<h1>$title$</h1>$endif$
+	$body$
     </div>
 
     <footer class="footer">

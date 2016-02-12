@@ -6,20 +6,20 @@ template=default
 inputextension=.md
 
 # Load config variables from file
-if [ -f ./.pdsite ]; then
-   # This isn't the best idea, but it works for now
-   # YAML would be ideal
-   # Arbitrary YAML (passed to template) + regex parsing for specific config vars?
-   source ./.pdsite
+if [ -f ./.pdsite.yml ]; then
+    # This isn't the best idea, but it works for now
+    # YAML would be ideal
+    # Arbitrary YAML (passed to template) + regex parsing for specific config vars?
+    configfile=$(pwd)'/.pdsite.yml'
+    template=$(cat $configfile | grep '^template:' | sed 's|^template:\s*\(.*\)$|\1|')
+    inputextension=$(cat $configfile | grep '^inputextension:' | sed 's|^inputextension:\s*\(.*\)$|\1|')
+    outputfolder=$(cat $configfile | grep '^outputfolder:' | sed 's|^outputfolder:\s*\(.*\)$|\1|')
 else
     echo "ERROR: .pdsite configuration file not detected" 1>&2
     exit 1
 fi
 
 templatepath=$templatespath/$template
-treedata=tree.yaml.tmp
-localtreedata=localtree.yaml.tmp
-stylesheet=styles.css
 
 # Convert to canonical path
 outputfolder=$(readlink -f $outputfolder)
@@ -28,6 +28,11 @@ escapedoutputfolder=$(echo $outputfolder | sed 's/\./\\./')
 # Build glob expressions
 extensionglob='*'$inputextension
 indexfileglob='*index'$inputextension
+
+# Define temporary file locations
+treedata=$outputfolder/tree.yml.tmp
+localtreedata=localtree.yml.tmp
+configblock=$outputfolder/config.yml.tmp
 
 # Define web-safe URL creation from file/directory names
 makeslug(){
@@ -45,6 +50,10 @@ rm -r $outputfolder/*
 echo " done."
 
 echo -n "Building site..."
+
+echo -e '\n---' > $configblock
+cat $configfile >> $configblock
+echo -e '...\n' >> $configblock
 
 # Generate base file structure
 find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type f | sed 's|\(.*\)\..*|\1|' | makeslug | xargs -I path mkdir -p $outputfolder/path
@@ -83,16 +92,16 @@ done >> $treedata
 echo -e '...\n' >> $treedata
 
 # Generate local contextual nav data
-find -path "$indexfileglob" -type f -execdir sh -c 'sed "s|\"path\":\"$(pwd | sed "s|'"$escapedoutputfolder"'||")\",|\0\"active\":y,|" '$outputfolder/$treedata' > '$localtreedata \;
+find -path "$indexfileglob" -type f -execdir sh -c 'sed "s|\"path\":\"$(pwd | sed "s|'"$escapedoutputfolder"'||")\",|\0\"active\":y,|" '$treedata' > '$localtreedata \;
 
 # Convert content files to contextual HTML
-find -path "$indexfileglob" -type f -execdir pandoc --template $templatepath/template.html -T "$sitename" -c "/$stylesheet" -V sitename="$sitename" -o index.html {} $localtreedata \; -delete
+find -path "$indexfileglob" -type f -execdir pandoc --template $templatepath/template.html -o index.html {} $localtreedata $configblock \; -delete
 
 # Move in CSS
 cp $templatepath/styles.css $outputfolder
 
 # Clean up
-find -path "*.tmp" -type f -delete
+#find -path "*.tmp" -type f -delete
 
 echo " done."
 
