@@ -7,9 +7,6 @@ inputextension=.md
 
 # Load config variables from file
 if [ -f ./.pdsite.yml ]; then
-    # This isn't the best idea, but it works for now
-    # YAML would be ideal
-    # Arbitrary YAML (passed to template) + regex parsing for specific config vars?
     configfile=$(pwd)'/.pdsite.yml'
     template=$(cat $configfile | grep '^template:' | sed 's|^template:\s*\(.*\)$|\1|')
     inputextension=$(cat $configfile | grep '^inputextension:' | sed 's|^inputextension:\s*\(.*\)$|\1|')
@@ -30,8 +27,10 @@ extensionglob='*'$inputextension
 indexfileglob='*index'$inputextension
 
 # Define temporary file locations
-treedata=$outputfolder/tree.yml.tmp
-localtreedata=localtree.yml.tmp
+globaltree=$outputfolder/tree.yml.tmp
+localtree=localtree.yml.tmp
+localblocktemplate=$outputfolder/localtemplate.yml.tmp
+localblock=local.yml.tmp
 configblock=$outputfolder/config.yml.tmp
 
 # Define web-safe URL creation from file/directory names
@@ -55,6 +54,10 @@ echo -e '\n---' > $configblock
 cat $configfile >> $configblock
 echo -e '...\n' >> $configblock
 
+echo -e "\n---
+pagename: _
+...\n" > $localblocktemplate
+
 # Generate base file structure
 find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type f | sed 's|\(.*\)\..*|\1|' | makeslug | xargs -I path mkdir -p $outputfolder/path
 
@@ -73,7 +76,7 @@ done
 cd $outputfolder
 
 # Generate global file structure for navigation templates
-echo -e '\n---' > $treedata
+echo -e '\n---' > $globaltree
 tree -dfJ --noreport | cut -c 2- | while read line; do
 
     # Generate path relative to site root
@@ -82,26 +85,35 @@ tree -dfJ --noreport | cut -c 2- | while read line; do
     # Generate pretty page name automatically
     name=$(echo $path | sed 's|.*/\(.*\)|\1|' | makepretty)
 
-    #TODO: Generate page title from pandoc metadata
-    # find -path "$indexfileglob" -type f -execdir ... pandoc ...
-
     # Inject page name and path into site tree
     echo $line | sed 's|"name":"\(.*\)","contents"|"name":"'"$name"'","path":"'"$path"'","contents"|'
 
-done >> $treedata
-echo -e '...\n' >> $treedata
+done >> $globaltree
+echo -e '...\n' >> $globaltree
 
-# Generate local contextual nav data
-find -path "$indexfileglob" -type f -execdir sh -c 'sed "s|\"path\":\"$(pwd | sed "s|'"$escapedoutputfolder"'||")\",|\0\"active\":y,|" '$treedata' > '$localtreedata \;
+# Generate local YAML
+find -path "$indexfileglob" -type f | while read line; do
+
+    relpath=${line%/*}
+    siteabspath=$(echo $relpath | cut -c 2-)
+
+    # Create local YAML block with auto-generated page name
+    name=$(echo ${relpath##*/} | makepretty)
+    sed 's|^pagename: _$|pagename: '"$name"'|' $localblocktemplate > $relpath/$localblock
+
+    # Create local YAML block with context-aware nav data
+    sed 's|"path":"'$siteabspath'",|\0"active":y,|' $globaltree > $relpath/$localtree
+
+done
 
 # Convert content files to contextual HTML
-find -path "$indexfileglob" -type f -execdir pandoc --template $templatepath/template.html -o index.html {} $localtreedata $configblock \; -delete
+find -path "$indexfileglob" -type f -execdir pandoc --template $templatepath/template.html -o index.html {} $localtree $localblock $configblock \; -delete
 
 # Move in CSS
 cp $templatepath/styles.css $outputfolder
 
 # Clean up
-#find -path "*.tmp" -type f -delete
+find -path "*.tmp" -type f -delete
 
 echo " done."
 
