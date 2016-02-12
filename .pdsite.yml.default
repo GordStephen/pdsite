@@ -1,0 +1,9 @@
+# Required variables
+
+template: default
+inputextension: .md
+outputfolder: .html
+
+# Template variables
+
+sitename: ""
