@@ -1,0 +1,11 @@
+# pdsite configuration
+
+theme: default
+inputextension: .md
+outputfolder: .html
+
+# Site-wide template variables
+
+sitename: "pdsite"
+pagetitle-suffix: "Pandoc-backed static site generator"
+footer: '<a href="https://github.com/GordStephen/pdsite">GitHub Repo</a> | <a href="https://github.com/GordStephen/pdsite/issues">Report an Issue</a>'

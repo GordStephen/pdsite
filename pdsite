@@ -49,9 +49,14 @@ function build(){
 	tr '-' ' ' | awk '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1'
     }
 
-    # Purge output folder
-    echo -n "Clearing old build folder..."
-    rm -r $outputfolder/*
+    # Set up output folder
+    if [ -d $outputfolder ]; then
+	echo -n "Clearing old build folder..."
+	rm -r $outputfolder/*
+    else
+	echo -n "Creating new build folder..."
+	mkdir $outputfolder
+    fi
     echo " done."
 
     echo -n "Building site..."

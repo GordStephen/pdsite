@@ -13,7 +13,7 @@ $endif$
 $if(keywords)$
   <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$">
 $endif$
-  <title>$if(pagetitle)$$pagetitle$$else$$pagename$$endif$ - $sitename$</title>
+  <title>$if(pagetitle)$$pagetitle$$else$$pagename$$endif$ | $sitename$$if(pagetitle-suffix)$ | $pagetitle-suffix$$endif$</title>
   <style type="text/css">code{white-space: pre;}</style>
 $if(quotes)$
   <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
@@ -88,7 +88,7 @@ $endif$
 
     <footer class="footer">
 	<div class="container">
-	<p class="text-muted">$footer$</p>
+	<p class="text-muted">$footer$<span class="pull-right">Built with pdsite</span></p>
 	</div>
     </footer>
 

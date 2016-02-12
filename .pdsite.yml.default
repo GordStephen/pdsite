@@ -7,4 +7,5 @@ outputfolder: .html
 # Site-wide template variables
 
 sitename: "My pdsite"
+pagetitle-suffix: ""
 footer: "My pdsite footer"
