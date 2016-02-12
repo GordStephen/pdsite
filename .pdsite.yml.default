@@ -1,9 +1,10 @@
-# Required variables
+# pdsite configuration
 
 template: default
 inputextension: .md
 outputfolder: .html
 
-# Template variables
+# Site-wide template variables
 
 sitename: ""
+footer: ""

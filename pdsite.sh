@@ -77,7 +77,7 @@ function build(){
 	cp "$inpath" "$outputfolder"/"$outpath"
     done
 
-    cd $outputfolder
+    cd "$outputfolder"
 
     # Generate global file structure for navigation templates
     echo -e '\n---' > $globaltree
@@ -113,11 +113,13 @@ function build(){
     # Convert content files to context-aware HTML
     find -path "$indexfileglob" -type f -execdir pandoc --template $templatepath/template.html -o index.html {} $localtree $localblock $configblock \; -delete
 
-    # Move in CSS
-    cp $templatepath/styles.css $outputfolder
-
     # Clean up
     find -path "*.tmp" -type f -delete
+
+    # Copy in template assets
+    cd "$templatepath"
+    find -not -path "." -type d -exec mkdir -p "$outputfolder"/{} \;
+    find -not -path "./template.html" -type f -exec cp {} "$outputfolder"/{} \;
 
     echo " done."
 }
