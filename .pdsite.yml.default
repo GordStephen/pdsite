@@ -1,10 +1,10 @@
 # pdsite configuration
 
-template: default
+theme: default
 inputextension: .md
 outputfolder: .html
 
 # Site-wide template variables
 
-sitename: ""
-footer: ""
+sitename: "My pdsite"
+footer: "My pdsite footer"

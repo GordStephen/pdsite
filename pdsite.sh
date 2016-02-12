@@ -1,7 +1,7 @@
 #! /usr/bin/sh
 
 scriptpath=$(readlink -f $0)
-templatespath=${scriptpath%/*}/themes
+themespath=${scriptpath%/*}/themes
 defaultconfig=${scriptpath%/*}/.pdsite.yml.default
 
 function init(){
@@ -13,10 +13,10 @@ function build(){
     # Load config variables from file
     if [ -f ./.pdsite.yml ]; then
 	configfile=$(pwd)'/.pdsite.yml'
-	template=$(cat $configfile | grep '^template:' | sed 's|^template:\s*\(.*\)$|\1|')
+	theme=$(cat $configfile | grep '^theme:' | sed 's|^theme:\s*\(.*\)$|\1|')
 	inputextension=$(cat $configfile | grep '^inputextension:' | sed 's|^inputextension:\s*\(.*\)$|\1|')
 	outputfolder=$(cat $configfile | grep '^outputfolder:' | sed 's|^outputfolder:\s*\(.*\)$|\1|')
-	[ "$template" ] && [ "$inputextension" ] && [ "$outputfolder" ] || {
+	[ "$theme" ] && [ "$inputextension" ] && [ "$outputfolder" ] || {
 	    echo "ERROR: Missing config variables in .pdsite.yml" 1>&2
 	    exit 1
 	}
@@ -25,7 +25,7 @@ function build(){
 	exit 1
     fi
 
-    templatepath=$templatespath/$template
+    themepath=$themespath/$theme
     outputfolder=$(readlink -f $outputfolder)
 
     # Build glob expressions
@@ -111,13 +111,13 @@ function build(){
     done
 
     # Convert content files to context-aware HTML
-    find -path "$indexfileglob" -type f -execdir pandoc --template $templatepath/template.html -o index.html {} $localtree $localblock $configblock \; -delete
+    find -path "$indexfileglob" -type f -execdir pandoc --template $themepath/template.html -o index.html {} $localtree $localblock $configblock \; -delete
 
     # Clean up
     find -path "*.tmp" -type f -delete
 
-    # Copy in template assets
-    cd "$templatepath"
+    # Copy in theme assets
+    cd "$themepath"
     find -not -path "." -type d -exec mkdir -p "$outputfolder"/{} \;
     find -not -path "./template.html" -type f -exec cp {} "$outputfolder"/{} \;
 

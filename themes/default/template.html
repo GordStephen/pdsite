@@ -47,15 +47,29 @@ $endif$
           <ul class="nav navbar-nav">
 	    $for(contents)$
 	    $if(contents.contents)$
-            <li class="dropdown $for(contents.contents)$$if(contents.contents.active)$active$endif$$endfor$">
+            <li class="dropdown $for(contents.contents)$
+			$if(contents.contents.active)$active
+			$else$
+			  $if(contents.contents.contents)$
+			    $for(contents.contents.contents)$
+			      $if(contents.contents.contents.active)$active$endif$
+			    $endfor$
+			  $endif$
+			$endif$
+		       $endfor$">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">$contents.name$ <span class="caret"></span></a>
               <ul class="dropdown-menu">
 		$for(contents.contents)$
+		$if(contents.contents.contents)$
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">$contents.contents.name$</li>
+		    $for(contents.contents.contents)$
+		    <li$if(contents.contents.contents.active)$ class="active"$endif$><a href="$contents.contents.contents.path$">$contents.contents.contents.name$</a></li>
+		    $endfor$
+		$else$
                 <li$if(contents.contents.active)$ class="active"$endif$><a href="$contents.contents.path$">$contents.contents.name$</a></li>
-                <!-- 3rd nested level? <li role="separator" class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">One more separated link</a></li> -->
-		$endfor$
+	        $endif$
+	        $endfor$
               </ul>
 	    </li>
 	    $else$
