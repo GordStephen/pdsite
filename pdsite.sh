@@ -85,14 +85,8 @@ echo -e '...\n' >> $treedata
 # Generate local contextual nav data
 find -path "$indexfileglob" -type f -execdir sh -c 'sed "s|\"path\":\"$(pwd | sed "s|'"$escapedoutputfolder"'||")\",|\0\"active\":y,|" '$outputfolder/$treedata' > '$localtreedata \;
 
-# Generate header files
-find -path "$indexfileglob" -type f -execdir pandoc -o header.html --template $templatepath/header.html -V sitename="$sitename" $localtreedata \;
-
-# Generate footer files
-find -path "$indexfileglob" -type f -execdir pandoc -o footer.html --template $templatepath/footer.html -V sitename="$sitename" $localtreedata \;
-
-# Convert content files to HTML
-find -path "$indexfileglob" -type f -execdir pandoc -T "$sitename" -c "/$stylesheet" -B header.html -A footer.html -V sitename="$sitename" -o index.html {} \; -execdir rm header.html footer.html \; -delete
+# Convert content files to contextual HTML
+find -path "$indexfileglob" -type f -execdir pandoc --template $templatepath/template.html -T "$sitename" -c "/$stylesheet" -V sitename="$sitename" -o index.html {} $localtreedata \; -delete
 
 # Move in CSS
 cp $templatepath/styles.css $outputfolder
