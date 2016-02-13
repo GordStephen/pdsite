@@ -1,5 +1,6 @@
 ---
 toc: n
+pagenameintitle: n
 ...
 
 # pdsite

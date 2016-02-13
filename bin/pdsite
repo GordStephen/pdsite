@@ -65,9 +65,10 @@ function build(){
     cat $configfile >> $configblock
     echo -e "...\n" >> $configblock
 
-    echo -e "\n---\npagename: _\n...\n" > $localblocktemplate
+    echo -e "\n---\npagenameintitle: y\npagename: _\n...\n" > $localblocktemplate
 
     # Generate base file structure
+    find -not -path "*/\.*" -type d | makeslug | xargs -I path mkdir -p "$outputfolder"/path
     find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type f | sed 's|\(.*\)\..*|\1|' | makeslug | xargs -I path mkdir -p $outputfolder/path
 
     # Copy in index files
@@ -81,6 +82,9 @@ function build(){
 	outpath=$(echo $inpath | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | makeslug)
 	cp "$inpath" "$outputfolder"/"$outpath"
     done
+
+    # Copy in other (non-written-content) files
+    find -not -path "*/\.*" -not -path "$extensionglob" -type f -exec cp {} "$outputfolder"/{} \;
 
     cd "$outputfolder"
 
