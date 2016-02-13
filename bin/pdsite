@@ -1,8 +1,8 @@
 #! /usr/bin/sh
 
 scriptpath=$(readlink -f $0)
-themespath=${scriptpath%/*}/themes
-defaultconfig=${scriptpath%/*}/.pdsite.yml.default
+themespath=${scriptpath%/*}/../themes
+defaultconfig=${scriptpath%/*}/../.pdsite.yml.default
 
 function init(){
     cp $defaultconfig .pdsite.yml
@@ -116,7 +116,7 @@ function build(){
     done
 
     # Convert content files to context-aware HTML
-    find -path "$indexfileglob" -type f -execdir pandoc --template $themepath/template.html -o index.html {} $localtree $localblock $configblock \; -delete
+    find -path "$indexfileglob" -type f -execdir pandoc --template $themepath/template.html --toc -o index.html {} $localtree $localblock $configblock \; -delete
 
     # Clean up
     find -path "*.tmp" -type f -delete

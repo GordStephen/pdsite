@@ -1,3 +1,7 @@
+---
+toc: n
+...
+
 # pdsite
 `pdsite` is a [Pandoc](http://pandoc.org/)-backed static site generator for Unix-like systems (including OSX, Linux, and BSD). It's comprised of a single shell script and has no dependencies on particular programming environments: it arose out of a desire for [MkDocs](http://www.mkdocs.org/)-like functionality with broader input format support and without the Python dependencies.
 

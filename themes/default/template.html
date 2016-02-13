@@ -23,8 +23,13 @@ $if(highlighting-css)$
 $highlighting-css$
   </style>
 $endif$
+  $if(bootswatch)$
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/$bootswatch$/bootstrap.min.css">
+  $else$
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  $endif$
   <link rel="stylesheet" href="/styles.css">
-$if(math)$
+    $if(math)$
   $math$
 $endif$
   <!--[if lt IE 9]>
@@ -32,7 +37,7 @@ $endif$
   <![endif]-->
 </head>
 <body>
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-default navbar-static-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -82,17 +87,31 @@ $endif$
     </nav>
 
     <div class="container">
-	$if(title)$<h1>$title$</h1>$endif$
-	$body$
+      $if(title)$
+      <div class="page-header"><h1>$title$$if(subtitle)$<small>$subtitle$</small>$endif$</h1></div>
+      $endif$
+	<div class="row">
+	    <div class="col-md-9">
+		$body$
+	    </div>
+	    $if(toc)$
+	    <div class="col-md-3">
+	      <nav id="toc" data-spy="affix" data-offset-top="0">
+		$if(title)$<h4><a href="#">$title$</a></h4>$endif$
+		$toc$
+	      </nav>
+	    </div>
+	    $endif$
+	</div>        
     </div>
 
-    <footer class="footer">
+    <nav class="navbar navbar-default navbar-static-bottom">
 	<div class="container">
-	<p class="text-muted">$footer$<span class="pull-right">Built with pdsite</span></p>
+	<p class="navbar-text">$footer$</p><p class="navbar-text navbar-right">Built with <a class="navbar-link" href="http://pdsite.org">pdsite</a></span></p>
 	</div>
     </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </body>
 </html>

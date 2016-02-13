@@ -12,18 +12,12 @@ These are generally available through your system package manager's repositories
 
 ### Installation
 
-`pdsite` is just a shell script, so installation is fairly straightforward. If you use Git, you can just navigate to your preferred installation location and run:
+`pdsite` is just a shell script, so installation is fairly straightforward. For example, using Git:
 
 ```sh
-git clone https://github.com/GordStephen/pdsite 
-chmod 755 pdsite/pdsite
+cd ~
+git clone https://github.com/GordStephen/pdsite .pdsite
+chmod 744 .pdsite/bin/pdsite
 ```
 
-Alternatively, you can download and unpack a [release](https://github.com/GordStephen/pdsite/releases):
-
-```sh
-wget ...
-unzip
-chmod 755 pdsite/pdsite
-```
-In either case, you may wish to add the install location to your path for easy use in the future.
+At this point the script can be run from anywhere using `~/.pdsite/bin/pdsite`. You will probably want to add `~/.pdsite/bin` to your shell's PATH variable to be able to simply call `pdsite` in the future.

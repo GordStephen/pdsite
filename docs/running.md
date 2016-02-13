@@ -21,9 +21,10 @@ outputfolder: .html
 
 # Site-wide template variables
 
+bootswatch: lumen 
 sitename: "pdsite"
 pagetitle-suffix: "Pandoc-backed static site generator"
-footer: '<a href="https://github.com/GordStephen/pdsite">pdsite on GitHub</a>'
+footer: '<a class="navbar-link" href="https://github.com/GordStephen/pdsite">GitHub Repo</a> | <a class="navbar-link" href="https://github.com/GordStephen/pdsite/issues">Report an Issue</a>'
 ```
 
 ### Building your site
@@ -39,7 +40,7 @@ Once a config file is defined, `pdsite` can convert the current directory into a
     └── creating-themes.md
 ```
 
-Converting arbitrarily-deep nested files to HTML is supported, although the built-in themes only support generating navigation menus for up to two levels of folders (e.g. `/category/subcategory/page`). A [custom theme](themes/creating-themes) could support automatically linking to deeper files.
+Converting arbitrarily-deep nested files to HTML is supported, although the built-in themes only support generating navigation menus for up to two levels of folders (e.g. `/category/subcategory/page`). A [custom theme](/themes/creating-themes) could support automatically linking to deeper files.
 
 To generate the HTML website, just run the `build` command:
 

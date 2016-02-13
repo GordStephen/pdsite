@@ -6,6 +6,7 @@ outputfolder: .html
 
 # Site-wide template variables
 
+bootswatch: lumen 
 sitename: "pdsite"
 pagetitle-suffix: "Pandoc-backed static site generator"
-footer: '<a href="https://github.com/GordStephen/pdsite">GitHub Repo</a> | <a href="https://github.com/GordStephen/pdsite/issues">Report an Issue</a>'
+footer: '<a class="navbar-link" href="https://github.com/GordStephen/pdsite">GitHub Repo</a> | <a class="navbar-link" href="https://github.com/GordStephen/pdsite/issues">Report an Issue</a>'
