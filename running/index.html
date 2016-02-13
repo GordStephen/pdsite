@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pdsite">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Running pdsite | pdsite | Pandoc-backed static site generator</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/lumen/bootstrap.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">pdsite</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+	    	    	    <li><a href="/installing">Installing</a></li>
+	    	  	    	    <li class="active"><a href="/running">Running</a></li>
+	    	  	                <li class="dropdown 			
+			  			
+		       			
+			  			
+		       ">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Themes <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+				                <li><a href="/themes/choosing-themes">Choosing Themes</a></li>
+	        	        		                <li><a href="/themes/creating-themes">Creating Themes</a></li>
+	        	                      </ul>
+	    </li>
+	    	            </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+            <div class="page-header"><h1>Running pdsite</h1></div>
+      	<div class="row">
+	    <div class="col-md-9">
+		<p><code>pdsite</code> uses the contents of the working directory to generate HTML files. The types of files it takes as input, the location of the output HTML, the HTML theme used, and other site-wide variables are defined via a configuration file (<code>.pdsite.yml</code>) in the current directory.</p>
+<h3 id="setting-up-.pdsite.yml">Setting up .pdsite.yml</h3>
+<p><code>pdsite</code> will not run in a directory unless a valid configuration file is present. To quickly create a valid file, use the <code>init</code> command:</p>
+<pre><code>$ pdsite init</code></pre>
+<p>This will create a default <code>.pdsite.yml</code> YAML file in your current directory. You can then customize it as desired. Any data defined in the config file is available to the template engine during the build process, so you can use this file to define site-wide variables. For example, the config file used to generate this site looked like:</p>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="co"># pdsite configuration</span>
+
+<span class="fu">theme:</span> default
+<span class="fu">inputextension:</span> .md
+<span class="fu">outputfolder:</span> .html
+
+<span class="co"># Site-wide template variables</span>
+
+<span class="fu">bootswatch:</span> lumen 
+<span class="fu">sitename:</span> <span class="st">&quot;pdsite&quot;</span>
+<span class="fu">pagetitle-suffix:</span> <span class="st">&quot;Pandoc-backed static site generator&quot;</span>
+<span class="fu">footer:</span> <span class="st">&#39;&lt;a class=&quot;navbar-link&quot; href=&quot;https://github.com/GordStephen/pdsite&quot;&gt;GitHub Repo&lt;/a&gt; | &lt;a class=&quot;navbar-link&quot; href=&quot;https://github.com/GordStephen/pdsite/issues&quot;&gt;Report an Issue&lt;/a&gt;&#39;</span></code></pre></div>
+<h3 id="building-your-site">Building your site</h3>
+<p>Once a config file is defined, <code>pdsite</code> can convert the current directory into a linked website according to its folder and file structure(hidden files are excluded). For example, this site was generated by the following file structure:</p>
+<pre><code>├── CNAME 
+├── index.md
+├── installing.md
+├── running.md
+└── themes
+    ├── choosing-themes.md
+    └── creating-themes.md</code></pre>
+<p>In that example, the input directory contains a number of Markdown documents (including some in a subfolder) and a &quot;CNAME&quot; file that needs to be copied in to the output directory.</p>
+<p>Converting arbitrarily-deep nested files to HTML is supported, although the built-in themes only support generating navigation menus for up to two levels of folders (e.g. <code>/category/subcategory/page</code>). A <a href="/themes/creating-themes">custom theme</a> could support automatically linking to deeper files.</p>
+<p>Any (non-hidden) files in the directory structure that aren't recognised as content to be converted (like the &quot;CNAME&quot; file above) are copied over to the output directory without any processing.</p>
+<p>To generate the HTML website, just run the <code>build</code> command:</p>
+<pre class="sh"><code>$ pdsite build
+Creating new build folder... done.
+Building site... done.</code></pre>
+<p>We can check the results in the specified output folder:</p>
+<pre class="sh"><code>$ tree .html
+.html
+├── CNAME 
+├── index.html
+├── installing
+│   └── index.html
+├── running
+│   └── index.html
+├── styles.css
+└── themes
+    ├── choosing-themes
+    │   └── index.html
+    └── creating-themes
+        └── index.html</code></pre>
+<p>The Markdown files have all be converted to HTML, with new directories created where appropriate to allow for simple pretty URLs. Non-Markdown files have been directly copied without any changes (and some new files have also been copied in as part of the theme).</p>
+<p>Alternatively, you could use the <code>serve</code> command, which first builds the site and then launches a server so you can see the results in a browser.</p>
+<pre class="sh"><code>$ pdsite serve
+Clearing old build folder... done.
+Building site... done.
+fix_ug: uid=1000 euid=1000 / gid=1000 egid=1000 / gids: 1000 10 95 
+http server started
+  ipv6  : yes
+  ssl   : no
+  node  : localhost.localdomain
+  ipaddr: ::
+  port  : 8000
+  export: /the/current/path/.html
+  user  : theuser 
+  group : thegroup </code></pre>
+<p>Visiting <code>localhost:8000</code> in your browser will display the site output. Auto-regeneration of the site when an input file changes is not yet supported, so you'll need to stop the server and re-run the command to see any modifications.</p>
+	    </div>
+	    	    <div class="col-md-3">
+	      <nav id="toc" data-spy="affix" data-offset-top="0">
+		<h4><a href="#">Running pdsite</a></h4>
+		<ul>
+<li><a href="#setting-up-.pdsite.yml">Setting up .pdsite.yml</a></li>
+<li><a href="#building-your-site">Building your site</a></li>
+</ul>
+	      </nav>
+	    </div>
+	    	</div>        
+    </div>
+
+    <nav class="navbar navbar-default navbar-static-bottom">
+	<div class="container">
+	<p class="navbar-text"><a class="navbar-link" href="https://github.com/GordStephen/pdsite">GitHub Repo</a> | <a class="navbar-link" href="https://github.com/GordStephen/pdsite/issues">Report an Issue</a></p><p class="navbar-text navbar-right">Built with <a class="navbar-link" href="http://pdsite.org">pdsite</a></span></p>
+	</div>
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</body>
+</html>
