@@ -1,0 +1,14 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    margin-bottom: 80px;
+
+}
+.navbar-static-bottom {
+    position:absolute;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 0;
+}
