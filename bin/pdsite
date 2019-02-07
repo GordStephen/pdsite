@@ -1,4 +1,4 @@
-#! /usr/bin/sh
+#! /usr/bin/env bash
 
 scriptpath=$(readlink -f $0)
 themespath=${scriptpath%/*}/../themes
