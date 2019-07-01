@@ -5,7 +5,12 @@ themespath=${scriptpath%/*}/../themes
 defaultconfig=${scriptpath%/*}/../.pdsite.yml.default
 
 function init() {
-	cp $defaultconfig .pdsite.yml
+	if [ ! -e .pdsite.yml ]; then
+		cp $defaultconfig .pdsite.yml
+	else
+		echo "ERROR: .pdsite.yml is already present" 1>&2
+		exit 1
+	fi
 }
 
 function build() {
