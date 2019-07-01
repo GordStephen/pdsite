@@ -4,11 +4,11 @@ scriptpath=$(readlink -f $0)
 themespath=${scriptpath%/*}/../themes
 defaultconfig=${scriptpath%/*}/../.pdsite.yml.default
 
-function init(){
+function init() {
 	cp $defaultconfig .pdsite.yml
 }
 
-function build(){
+function build() {
 
 	# Load config variables from file
 	if [ -f ./.pdsite.yml ]; then
@@ -40,13 +40,13 @@ function build(){
 	configblock=$outputfolder/config.yml.tmp
 
 	# Define web-safe URL creation from file/directory names
-	makeslug(){
+	makeslug() {
 		tr -dc '[:graph:][:space:]' | tr '[:upper:]' '[:lower:]' | tr -s ' -_'  | tr ' _' '-'
 	}
 
 	# Define human-readable page title creation from web-safe filenames
-	makepretty(){
-		tr '-' ' ' | awk '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1'
+	makepretty() {
+		tr '-' ' ' | awk '{ for (i = 1; i <= NF; i++) { $i = toupper(substr($i, 1, 1)) substr($i, 2) }} 1'
 	}
 
 	# Set up output folder
@@ -133,7 +133,7 @@ function build(){
 	echo " done."
 }
 
-function serve(){
+function serve() {
 	build
 	webfsd -Fd -r $outputfolder -f index.html -l -
 }
