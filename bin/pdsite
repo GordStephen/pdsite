@@ -5,145 +5,145 @@ themespath=${scriptpath%/*}/../themes
 defaultconfig=${scriptpath%/*}/../.pdsite.yml.default
 
 function init(){
-    cp $defaultconfig .pdsite.yml
+	cp $defaultconfig .pdsite.yml
 }
 
 function build(){
 
-    # Load config variables from file
-    if [ -f ./.pdsite.yml ]; then
-	configfile=$(pwd)'/.pdsite.yml'
-	theme=$(cat $configfile | grep '^theme:' | sed 's|^theme:\s*\(.*\)$|\1|')
-	inputextension=$(cat $configfile | grep '^inputextension:' | sed 's|^inputextension:\s*\(.*\)$|\1|')
-	outputfolder=$(cat $configfile | grep '^outputfolder:' | sed 's|^outputfolder:\s*\(.*\)$|\1|')
-	[ "$theme" ] && [ "$inputextension" ] && [ "$outputfolder" ] || {
-	    echo "ERROR: Missing config variables in .pdsite.yml" 1>&2
-	    exit 1
+	# Load config variables from file
+	if [ -f ./.pdsite.yml ]; then
+		configfile=$(pwd)'/.pdsite.yml'
+		theme=$(cat $configfile | grep '^theme:' | sed 's|^theme:\s*\(.*\)$|\1|')
+		inputextension=$(cat $configfile | grep '^inputextension:' | sed 's|^inputextension:\s*\(.*\)$|\1|')
+		outputfolder=$(cat $configfile | grep '^outputfolder:' | sed 's|^outputfolder:\s*\(.*\)$|\1|')
+		[ "$theme" ] && [ "$inputextension" ] && [ "$outputfolder" ] || {
+			echo "ERROR: Missing config variables in .pdsite.yml" 1>&2
+			exit 1
+		}
+	else
+		echo "ERROR: .pdsite.yml configuration file not detected" 1>&2
+		exit 1
+	fi
+
+	themepath=$themespath/$theme
+	outputfolder=$(readlink -f $outputfolder)
+
+	# Build glob expressions
+	extensionglob='*'$inputextension
+	indexfileglob='*index'$inputextension
+
+	# Define temporary file locations
+	globaltree=$outputfolder/tree.yml.tmp
+	localtree=localtree.yml.tmp
+	localblocktemplate=$outputfolder/localtemplate.yml.tmp
+	localblock=local.yml.tmp
+	configblock=$outputfolder/config.yml.tmp
+
+	# Define web-safe URL creation from file/directory names
+	makeslug(){
+		tr -dc '[:graph:][:space:]' | tr '[:upper:]' '[:lower:]' | tr -s ' -_'  | tr ' _' '-'
 	}
-    else
-	echo "ERROR: .pdsite.yml configuration file not detected" 1>&2
-	exit 1
-    fi
 
-    themepath=$themespath/$theme
-    outputfolder=$(readlink -f $outputfolder)
+	# Define human-readable page title creation from web-safe filenames
+	makepretty(){
+		tr '-' ' ' | awk '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1'
+	}
 
-    # Build glob expressions
-    extensionglob='*'$inputextension
-    indexfileglob='*index'$inputextension
+	# Set up output folder
+	if [ -d $outputfolder ]; then
+		echo -n "Clearing old build folder..."
+		rm -r $outputfolder/*
+	else
+		echo -n "Creating new build folder..."
+		mkdir $outputfolder
+	fi
+	echo " done."
 
-    # Define temporary file locations
-    globaltree=$outputfolder/tree.yml.tmp
-    localtree=localtree.yml.tmp
-    localblocktemplate=$outputfolder/localtemplate.yml.tmp
-    localblock=local.yml.tmp
-    configblock=$outputfolder/config.yml.tmp
+	echo -n "Building site..."
 
-    # Define web-safe URL creation from file/directory names
-    makeslug(){
-	tr -dc '[:graph:][:space:]' | tr '[:upper:]' '[:lower:]' | tr -s ' -_'  | tr ' _' '-'
-    }
+	echo -e "\n---" > $configblock
+	cat $configfile >> $configblock
+	echo -e "...\n" >> $configblock
 
-    # Define human-readable page title creation from web-safe filenames
-    makepretty(){
-	tr '-' ' ' | awk '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1'
-    }
+	echo -e "\n---\npagenameintitle: y\npagename: _\n...\n" > $localblocktemplate
 
-    # Set up output folder
-    if [ -d $outputfolder ]; then
-	echo -n "Clearing old build folder..."
-	rm -r $outputfolder/*
-    else
-	echo -n "Creating new build folder..."
-	mkdir $outputfolder
-    fi
-    echo " done."
+	# Generate base file structure
+	find -not -path "*/\.*" -type d | makeslug | xargs -I path mkdir -p "$outputfolder"/path
+	find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type f | sed 's|\(.*\)\..*|\1|' | makeslug | xargs -I path mkdir -p $outputfolder/path
 
-    echo -n "Building site..."
+	# Copy in index files
+	find -not -path "*/\.*" -path "$indexfileglob" -type f | while read inpath; do
+		outpath=$(echo $inpath | makeslug)
+		cp "$inpath" "$outputfolder/$outpath"
+	done
 
-    echo -e "\n---" > $configblock
-    cat $configfile >> $configblock
-    echo -e "...\n" >> $configblock
+	# Copy in other content files
+	find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type f | while read inpath; do
+		outpath=$(echo $inpath | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | makeslug)
+		cp "$inpath" "$outputfolder"/"$outpath"
+	done
 
-    echo -e "\n---\npagenameintitle: y\npagename: _\n...\n" > $localblocktemplate
+	# Copy in other (non-written-content) files
+	find -not -path "*/\.*" -not -path "$extensionglob" -type f -exec cp {} "$outputfolder"/{} \;
 
-    # Generate base file structure
-    find -not -path "*/\.*" -type d | makeslug | xargs -I path mkdir -p "$outputfolder"/path
-    find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type f | sed 's|\(.*\)\..*|\1|' | makeslug | xargs -I path mkdir -p $outputfolder/path
+	cd "$outputfolder"
 
-    # Copy in index files
-    find -not -path "*/\.*" -path "$indexfileglob" -type f | while read inpath; do
-	outpath=$(echo $inpath | makeslug)
-	cp "$inpath" "$outputfolder/$outpath"
-    done
+	# Generate global file structure for navigation templates
+	echo -e '\n---' > $globaltree
+	tree -dfJ --noreport | cut -c 2- | while read line; do
 
-    # Copy in other content files
-    find -not -path "*/\.*" -not -path "$indexfileglob" -path "$extensionglob" -type f | while read inpath; do
-	outpath=$(echo $inpath | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | makeslug)
-	cp "$inpath" "$outputfolder"/"$outpath"
-    done
+		# Generate path relative to site root
+		path=$(echo $line | grep 'type' | sed 's|.*"name":"\.\(.*\)","contents".*|\1|')
 
-    # Copy in other (non-written-content) files
-    find -not -path "*/\.*" -not -path "$extensionglob" -type f -exec cp {} "$outputfolder"/{} \;
+		# Generate pretty page name automatically
+		name=$(echo $path | sed 's|.*/\(.*\)|\1|' | makepretty)
 
-    cd "$outputfolder"
+		# Inject page name and path into site tree
+		echo $line | sed 's|"name":"\(.*\)","contents"|"name":"'"$name"'","path":"'"$path"'","contents"|'
 
-    # Generate global file structure for navigation templates
-    echo -e '\n---' > $globaltree
-    tree -dfJ --noreport | cut -c 2- | while read line; do
+	done >> $globaltree
+	echo -e '...\n' >> $globaltree
 
-	# Generate path relative to site root
-	path=$(echo $line | grep 'type' | sed 's|.*"name":"\.\(.*\)","contents".*|\1|')
+	# Generate local YAML
+	find -path "$indexfileglob" -type f | while read line; do
 
-	# Generate pretty page name automatically
-	name=$(echo $path | sed 's|.*/\(.*\)|\1|' | makepretty)
+		relpath=${line%/*}
+		siteabspath=$(echo $relpath | cut -c 2-)
 
-	# Inject page name and path into site tree
-	echo $line | sed 's|"name":"\(.*\)","contents"|"name":"'"$name"'","path":"'"$path"'","contents"|'
+		# Create local YAML block with auto-generated page name
+		name=$(echo ${relpath##*/} | makepretty)
+		sed 's|^pagename: _$|pagename: '"$name"'|' $localblocktemplate > $relpath/$localblock
 
-    done >> $globaltree
-    echo -e '...\n' >> $globaltree
+		# Create local YAML block with context-aware file tree data
+		sed 's|"path":"'$siteabspath'",|\0"active":y,|' $globaltree > $relpath/$localtree
 
-    # Generate local YAML
-    find -path "$indexfileglob" -type f | while read line; do
+	done
 
-	relpath=${line%/*}
-	siteabspath=$(echo $relpath | cut -c 2-)
+	# Convert content files to context-aware HTML
+	find -path "$indexfileglob" -type f -execdir pandoc --template $themepath/template.html --toc -o index.html {} $localtree $localblock $configblock \; -delete
 
-	# Create local YAML block with auto-generated page name
-	name=$(echo ${relpath##*/} | makepretty)
-	sed 's|^pagename: _$|pagename: '"$name"'|' $localblocktemplate > $relpath/$localblock
+	# Clean up
+	find -path "*.tmp" -type f -delete
 
-	# Create local YAML block with context-aware file tree data
-	sed 's|"path":"'$siteabspath'",|\0"active":y,|' $globaltree > $relpath/$localtree
+	# Copy in theme assets
+	cd "$themepath"
+	find -not -path "." -type d -exec mkdir -p "$outputfolder"/{} \;
+	find -not -path "./template.html" -type f -exec cp {} "$outputfolder"/{} \;
 
-    done
-
-    # Convert content files to context-aware HTML
-    find -path "$indexfileglob" -type f -execdir pandoc --template $themepath/template.html --toc -o index.html {} $localtree $localblock $configblock \; -delete
-
-    # Clean up
-    find -path "*.tmp" -type f -delete
-
-    # Copy in theme assets
-    cd "$themepath"
-    find -not -path "." -type d -exec mkdir -p "$outputfolder"/{} \;
-    find -not -path "./template.html" -type f -exec cp {} "$outputfolder"/{} \;
-
-    echo " done."
+	echo " done."
 }
 
 function serve(){
-    build
-    webfsd -Fd -r $outputfolder -f index.html -l -
+	build
+	webfsd -Fd -r $outputfolder -f index.html -l -
 }
 
 case $1 in
-    "init") init;;
-    "build") build;;
-    "serve") serve;;
-    *)
-	echo "Unknown command $1"
-	exit 1
-	;;
+	"init") init;;
+	"build") build;;
+	"serve") serve;;
+	*)
+		echo "Unknown command $1"
+		exit 1
+		;;
 esac
