@@ -4,6 +4,18 @@ scriptpath=$(readlink -f $0)
 themespath=${scriptpath%/*}/../themes
 defaultconfig=${scriptpath%/*}/../.pdsite.yml.default
 
+function help() {
+	echo "`basename $0` - Simple static site generator, written in BASH, using pandoc."
+	echo
+	echo "Usage:"
+	echo "   `basename $0` command"
+	echo
+	echo "Commands:"
+	echo "   init	 initializes a new pdsite project in the current directory"
+	echo "   build	builds the static site in the current directory"
+	echo "   serve	serves the static site in the current directory on a local webserver"
+}
+
 function init() {
 	if [ ! -e .pdsite.yml ]; then
 		cp $defaultconfig .pdsite.yml
@@ -149,6 +161,7 @@ case $1 in
 	"serve") serve;;
 	*)
 		echo "Unknown command '$1'" 1>&2
+		help
 		exit 1
 		;;
 esac
