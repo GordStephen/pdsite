@@ -25,4 +25,9 @@ chmod 744 .pdsite/bin/pdsite
 
 At this point, the script can be run from anywhere using `~/.pdsite/bin/pdsite`.
 You will probably want to add `~/.pdsite/bin` to your shell's `PATH` variable
-to be able to simply call `pdsite` in the future.
+to be able to simply call `pdsite` in the future:
+
+```sh
+export PATH="$PATH:$HOME/.pdsite/bin"
+echo "PATH=\"\$PATH:\$HOME/.pdsite/bin\"" >> "$HOME/.profile"
+```
