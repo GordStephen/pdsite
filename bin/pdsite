@@ -51,6 +51,16 @@ function init() {
 	fi
 }
 
+# Define web-safe URL creation from file/directory names
+function make_slug() {
+	tr -dc '[:graph:][:space:]' | tr '[:upper:]' '[:lower:]' | tr -s ' -_'  | tr ' _' '-'
+}
+
+# Define human-readable page title creation from web-safe filenames
+function make_pretty() {
+	tr '-' ' ' | awk '{ for (i = 1; i <= NF; i++) { $i = toupper(substr($i, 1, 1)) substr($i, 2) }} 1'
+}
+
 function build() {
 
 	# Load config variables from file
@@ -81,16 +91,6 @@ function build() {
 	local_block_template=$output_folder/localtemplate.yml.tmp
 	local_block=local.yml.tmp
 	config_block=$output_folder/config.yml.tmp
-
-	# Define web-safe URL creation from file/directory names
-	make_slug() {
-		tr -dc '[:graph:][:space:]' | tr '[:upper:]' '[:lower:]' | tr -s ' -_'  | tr ' _' '-'
-	}
-
-	# Define human-readable page title creation from web-safe filenames
-	make_pretty() {
-		tr '-' ' ' | awk '{ for (i = 1; i <= NF; i++) { $i = toupper(substr($i, 1, 1)) substr($i, 2) }} 1'
-	}
 
 	# Set up output folder
 	if [ -d $output_folder ]; then
