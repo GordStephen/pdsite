@@ -53,12 +53,16 @@ function init() {
 
 # Define web-safe URL creation from file/directory names
 function make_slug() {
-	tr -dc '[:graph:][:space:]' | tr '[:upper:]' '[:lower:]' | tr -s ' -_'  | tr ' _' '-'
+	tr -dc '[:graph:][:space:]' \
+		| tr '[:upper:]' '[:lower:]' \
+		| tr -s ' -_'  \
+		| tr ' _' '-'
 }
 
 # Define human-readable page title creation from web-safe filenames
 function make_pretty() {
-	tr '-' ' ' | awk '{ for (i = 1; i <= NF; i++) { $i = toupper(substr($i, 1, 1)) substr($i, 2) }} 1'
+	tr '-' ' ' \
+		| awk '{ for (i = 1; i <= NF; i++) { $i = toupper(substr($i, 1, 1)) substr($i, 2) }} 1'
 }
 
 function build() {
@@ -116,17 +120,26 @@ function build() {
 	[[ "$output_folder" == `pwd`* ]] && out_exclude='.'${output_folder#"`pwd`"}
 
 	# Generate base file structure
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -type d | make_slug | xargs -I path mkdir -p "$output_folder"/path
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$index_file_glob" -path "$extension_glob" -type f | sed 's|\(.*\)\..*|\1|' | make_slug | xargs -I path mkdir -p $output_folder/path
+	find -not -path "*/\.*" -not -path "${out_exclude}*" -type d \
+		| make_slug \
+		| xargs -I path mkdir -p "$output_folder"/path
+	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$index_file_glob" -path "$extension_glob" -type f \
+		| sed 's|\(.*\)\..*|\1|' \
+		| make_slug \
+		| xargs -I path mkdir -p $output_folder/path
 
 	# Copy in index files
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -path "$index_file_glob" -type f | while read in_path; do
+	find -not -path "*/\.*" -not -path "${out_exclude}*" -path "$index_file_glob" -type f \
+		| while read in_path
+	do
 		out_path=$(echo $in_path | make_slug)
 		cp "$in_path" "$output_folder/$out_path"
 	done
 
 	# Copy in other content files
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$index_file_glob" -path "$extension_glob" -type f | while read in_path; do
+	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$index_file_glob" -path "$extension_glob" -type f \
+		| while read in_path
+	do
 		out_path=$(echo $in_path | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | make_slug)
 		cp "$in_path" "$output_folder"/"$out_path"
 	done
@@ -168,7 +181,9 @@ function build() {
 	done
 
 	# Convert content files to context-aware HTML
-	find -not -path "${output_folder}*" -path "$index_file_glob" -type f -execdir pandoc --template $theme_path/template.html --toc -o index.html {} $local_tree $local_block $config_block \; -delete
+	find -not -path "${output_folder}*" -path "$index_file_glob" -type f \
+		-execdir pandoc --template $theme_path/template.html --toc -o index.html \
+			{} $local_tree $local_block $config_block \; -delete
 
 	# Clean up
 	find -path "*.tmp" -type f -delete
