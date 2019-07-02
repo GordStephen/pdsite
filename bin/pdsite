@@ -204,6 +204,8 @@ function serve() {
 
 check_deps
 
+set -e
+
 case $1 in
 	"init") init;;
 	"build") build;;
