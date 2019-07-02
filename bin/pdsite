@@ -16,6 +16,32 @@ function print_help() {
 	echo "   serve	serves the static site in the current directory on a local webserver"
 }
 
+# Checks whether a binary we depend on is available
+function check_dep() {
+	ret=0
+	cmd_name="$1"
+	cmd_use_case="$2"
+	cmd_path=`which "$cmd_name"`
+	if [ -z "$cmd_path" ]; then
+		ret=1
+		echo "Could not find dependency '$cmd_name', used ${cmd_use_case}." 1>&2
+	fi
+	return $ret
+}
+
+# Checks whether our dependencies are available
+function check_deps() {
+	ret=0
+	check_dep tree "to generate the site structure, depending on the sources directory layout" \
+		; ret=$(($ret + $?))
+	check_dep pandoc "to convert '*.md' -> '*.html'" \
+		; ret=$(($ret + $?))
+	check_dep busybox "for local http hosting" \
+		; ret=$(($ret + $?))
+	[ $ret -gt 0 ] && exit $ret
+	return $ret
+}
+
 function init() {
 	if [ ! -e .pdsite.yml ]; then
 		cp $defaultconfig .pdsite.yml
@@ -160,6 +186,8 @@ function serve() {
 	echo "Hosting with busybox on 'http://127.0.0.1:8080' (stop with Ctrl-C) ..."
 	busybox httpd -f -p 127.0.0.1:8080 -h "$outputfolder"
 }
+
+check_deps
 
 case $1 in
 	"init") init;;
