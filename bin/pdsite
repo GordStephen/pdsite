@@ -157,7 +157,8 @@ function build() {
 
 function serve() {
 	build
-	webfsd -Fd -r $outputfolder -f index.html -l -
+	echo "Hosting with busybox on 'http://127.0.0.1:8080' (stop with Ctrl-C) ..."
+	busybox httpd -f -p 127.0.0.1:8080 -h "$outputfolder"
 }
 
 case $1 in

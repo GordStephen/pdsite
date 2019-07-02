@@ -81,17 +81,8 @@ Alternatively, you could use the `serve` command, which first builds the site an
 $ pdsite serve
 Clearing old build folder... done.
 Building site... done.
-fix_ug: uid=1000 euid=1000 / gid=1000 egid=1000 / gids: 1000 10 95 
-http server started
-  ipv6  : yes
-  ssl   : no
-  node  : localhost.localdomain
-  ipaddr: ::
-  port  : 8000
-  export: /the/current/path/.html
-  user  : theuser 
-  group : thegroup 
+Hosting with busybox on 'http://127.0.0.1:8080' (stop with Ctrl-C) ...
 ```
 
-Visiting `localhost:8000` in your browser will display the site output. Auto-regeneration of the site when an input file changes is not yet supported, so you'll need to stop the server and re-run the command to see any modifications.
+Visiting `127.0.0.1:8080` in your browser will display the site output. Auto-regeneration of the site when an input file changes is not yet supported, so you'll need to stop the server and re-run the command to see any modifications.
 

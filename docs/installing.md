@@ -6,7 +6,7 @@
 
 - [pandoc](http://pandoc.org/) (for all the heavy lifting)
 - [tree](http://mama.indstate.edu/users/ice/tree/) (for generating file structures for navigation menus, etc)
-- [webfs](http://linux.bytesex.org/misc/webfs.html) (optional: for easily viewing the site after building)
+- [busybox](https://www.busybox.net/) (optional: for easily viewing the site after building)
 
 These are generally available through your system package manager's repositories (`brew`, `apt-get`, `yum`, `pacman`, etc)
 
