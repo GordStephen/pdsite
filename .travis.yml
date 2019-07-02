@@ -1,0 +1,14 @@
+# Use the (faster) container-based infrastructure, see also
+# http://docs.travis-ci.com/user/workers/container-based-infrastructure/
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - pandoc
+    - texlive-latex-base
+
+script:
+  - cd docs
+  - ../bin/pdsite build
+
