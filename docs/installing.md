@@ -1,8 +1,11 @@
-% Installing
+---
+title: Installing
+---
 
 ### Dependencies
 
-`pdsite` aims to keep its dependencies short and simple. The complete list is:
+`pdsite` aims to keep its dependencies short and simple.
+The complete list is:
 
 - [pandoc](http://pandoc.org/) (for all the heavy lifting)
 - [tree](http://mama.indstate.edu/users/ice/tree/) (for generating file structures for navigation menus, etc)
@@ -20,4 +23,6 @@ git clone https://github.com/GordStephen/pdsite .pdsite
 chmod 744 .pdsite/bin/pdsite
 ```
 
-At this point the script can be run from anywhere using `~/.pdsite/bin/pdsite`. You will probably want to add `~/.pdsite/bin` to your shell's PATH variable to be able to simply call `pdsite` in the future.
+At this point, the script can be run from anywhere using `~/.pdsite/bin/pdsite`.
+You will probably want to add `~/.pdsite/bin` to your shell's `PATH` variable
+to be able to simply call `pdsite` in the future.
