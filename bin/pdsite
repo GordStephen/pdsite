@@ -65,18 +65,24 @@ function make_pretty() {
 		| awk '{ for (i = 1; i <= NF; i++) { $i = toupper(substr($i, 1, 1)) substr($i, 2) }} 1'
 }
 
+function get_config_var() {
+	var_name="$1"
+	value=$(cat $config_file | grep '^'"$var_name"':' | sed 's|^'"$var_name"':\s*\(.*\)$|\1|')
+	[ "$value" ] || {
+		echo "ERROR: Missing config variable '$var_name' in .pdsite.yml" 1>&2
+		exit 1
+	}
+	echo -n "$value"
+}
+
 function build() {
 
 	# Load config variables from file
 	if [ -f ./.pdsite.yml ]; then
 		config_file=$(pwd)'/.pdsite.yml'
-		theme=$(cat $config_file | grep '^theme:' | sed 's|^theme:\s*\(.*\)$|\1|')
-		input_extension=$(cat $config_file | grep '^inputextension:' | sed 's|^inputextension:\s*\(.*\)$|\1|')
-		output_folder=$(cat $config_file | grep '^outputfolder:' | sed 's|^outputfolder:\s*\(.*\)$|\1|')
-		[ "$theme" ] && [ "$input_extension" ] && [ "$output_folder" ] || {
-			echo "ERROR: Missing config variables in .pdsite.yml" 1>&2
-			exit 1
-		}
+		theme=$(get_config_var 'theme')
+		input_extension=$(get_config_var 'inputextension')
+		output_folder=$(get_config_var 'outputfolder')
 	else
 		echo "ERROR: .pdsite.yml configuration file not detected" 1>&2
 		exit 1
