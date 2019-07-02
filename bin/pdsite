@@ -32,8 +32,6 @@ function check_dep() {
 # Checks whether our dependencies are available
 function check_deps() {
 	ret=0
-	check_dep tree "to generate the site structure, depending on the sources directory layout" \
-		; ret=$(($ret + $?))
 	check_dep pandoc "to convert '*.md' -> '*.html'" \
 		; ret=$(($ret + $?))
 	check_dep busybox "for local http hosting" \
@@ -78,18 +76,47 @@ function get_config_var() {
 # Generate global file structure for navigation templates
 function navi() {
 	echo -e '\n---'
-	tree -dfJ --noreport | cut -c 2- | while read line; do
 
-		# Generate path relative to site root
-		path=$(echo $line | grep 'type' | sed 's|.*"name":"\.\(.*\)","contents".*|\1|')
+	# Match nothing
+	np_prev=""
+	np_open=0
+	while read -r np
+	do
+		# Close finished sub-folders
+		while [[ "$np" != $np_prev* ]]
+		do
+			echo "]},"
+			np_open=$(($np_open - 1))
+			np_prev=$(dirname "$np_prev")
+		done
 
-		# Generate pretty page name automatically
-		name=$(echo $path | sed 's|.*/\(.*\)|\1|' | make_pretty)
+		# Open parent folders without content
+		while [[ "$np" != "$np_prev" ]] || [[ $np_open -eq 0 ]]
+		do
+			# Adding one path element
+			# Generate path relative to site root
+			path="${np_prev}$(echo ${np:${#np_prev}} | sed -e 's|\(.\)/.*|\1|')"
 
-		# Inject page name and path into site tree
-		echo $line | sed 's|"name":"\(.*\)","contents"|"name":"'"$name"'","path":"'"$path"'","contents"|'
+			# Generate pretty page name automatically
+			name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
 
+			path_rtf="$(echo $path | sed -e 's/^\.//')"
+			path_part=""
+			[ -n "$path_rtf" ] && path_part='"path":"'$path_rtf'",'
+			echo '{"type":"directory","name":"'$name'",'$path_part'"contents":['
+			np_open=$(($np_open + 1))
+
+			np_prev="$path"
+		done
+	done < <(find . -not -path "*/\.*" -name "$extension_glob" -type f | xargs dirname | sort | uniq)
+
+	# Close remaining folders
+	while [ $np_open -gt 0 ]
+	do
+		echo "]}"
+		np_open=$(($np_open - 1))
 	done
+
 	echo -e '...\n'
 }
 
