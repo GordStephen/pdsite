@@ -84,7 +84,7 @@ function build() {
 		input_extension=$(get_config_var 'inputextension')
 		output_folder=$(get_config_var 'outputfolder')
 	else
-		echo "ERROR: .pdsite.yml configuration file not detected" 1>&2
+		echo "ERROR: .pdsite.yml configuration file not found" 1>&2
 		exit 1
 	fi
 
