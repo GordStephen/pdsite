@@ -4,7 +4,7 @@ scriptpath=$(readlink -f $0)
 themespath=${scriptpath%/*}/../themes
 defaultconfig=${scriptpath%/*}/../.pdsite.yml.default
 
-function help() {
+function print_help() {
 	echo "`basename $0` - Simple static site generator, written in BASH, using pandoc."
 	echo
 	echo "Usage:"
@@ -161,7 +161,7 @@ case $1 in
 	"serve") serve;;
 	*)
 		echo "Unknown command '$1'" 1>&2
-		help
+		print_help
 		exit 1
 		;;
 esac
