@@ -7,10 +7,12 @@ title: Installing
 `pdsite` aims to keep its dependencies short and simple.
 The complete list is:
 
-- [pandoc](http://pandoc.org/) (for all the heavy lifting)
-- [busybox](https://www.busybox.net/) (optional: for easily viewing the site after building)
+- [pandoc](http://pandoc.org/) -
+  for all the heavy lifting
+- [busybox](https://www.busybox.net/) (optional, usually pre-installed) -
+  for local HTTP hosting of the the site after building
 
-These are generally available through your system package manager's repositories (`brew`, `apt-get`, `yum`, `pacman`, etc)
+These are generally available through your systems package manager's repositories (`brew`, `apt-get`, `yum`, `pacman`, etc)
 
 ### Installation
 
