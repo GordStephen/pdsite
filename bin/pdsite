@@ -75,6 +75,24 @@ function get_config_var() {
 	echo -n "$value"
 }
 
+# Generate global file structure for navigation templates
+function navi() {
+	echo -e '\n---'
+	tree -dfJ --noreport | cut -c 2- | while read line; do
+
+		# Generate path relative to site root
+		path=$(echo $line | grep 'type' | sed 's|.*"name":"\.\(.*\)","contents".*|\1|')
+
+		# Generate pretty page name automatically
+		name=$(echo $path | sed 's|.*/\(.*\)|\1|' | make_pretty)
+
+		# Inject page name and path into site tree
+		echo $line | sed 's|"name":"\(.*\)","contents"|"name":"'"$name"'","path":"'"$path"'","contents"|'
+
+	done
+	echo -e '...\n'
+}
+
 function build() {
 
 	# Load config variables from file
@@ -155,21 +173,7 @@ function build() {
 
 	cd "$output_folder"
 
-	# Generate global file structure for navigation templates
-	echo -e '\n---' > $global_tree
-	tree -dfJ --noreport | cut -c 2- | while read line; do
-
-		# Generate path relative to site root
-		path=$(echo $line | grep 'type' | sed 's|.*"name":"\.\(.*\)","contents".*|\1|')
-
-		# Generate pretty page name automatically
-		name=$(echo $path | sed 's|.*/\(.*\)|\1|' | make_pretty)
-
-		# Inject page name and path into site tree
-		echo $line | sed 's|"name":"\(.*\)","contents"|"name":"'"$name"'","path":"'"$path"'","contents"|'
-
-	done >> $global_tree
-	echo -e '...\n' >> $global_tree
+	navi > $global_tree
 
 	# Generate local YAML
 	find -path "$index_file_glob" -type f | while read line; do
