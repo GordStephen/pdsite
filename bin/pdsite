@@ -229,6 +229,11 @@ function build() {
 		-execdir pandoc --template $theme_path/template.html --toc -o index.html \
 			{} $local_tree $local_block $config_block \; -delete
 
+	# Check if site has a usable structure
+	start_path="index.html"
+	if [ ! -e "${output_folder}/$start_path" ]; then
+		echo "WARNING: There is no index.html in the web-site root folder." 1>&2
+	fi
 	# Clean up
 	find -path "*.tmp" -type f -delete
 
