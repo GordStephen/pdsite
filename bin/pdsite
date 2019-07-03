@@ -35,10 +35,14 @@ function check_dep() {
 # Checks whether our dependencies are available
 function check_deps() {
 	ret=0
+
+	# required
 	check_dep pandoc "to convert '*.md' -> '*.html'" \
 		; ret=$(($ret + $?))
-	check_dep busybox "for local http hosting" \
-		; ret=$(($ret + $?))
+
+	# optional
+	check_dep busybox "for local http hosting"
+
 	[ $ret -gt 0 ] && exit $ret
 	return $ret
 }
@@ -238,8 +242,14 @@ function build() {
 
 function serve() {
 	build
-	echo "Hosting with busybox on 'http://127.0.0.1:8080' (stop with Ctrl-C) ..."
-	busybox httpd -f -p 127.0.0.1:8080 -h "$output_folder"
+	if check_dep busybox 2> /dev/null
+	then
+		echo "Hosting with busybox on 'http://127.0.0.1:8080' (stop with Ctrl-C) ..."
+		busybox httpd -f -p 127.0.0.1:8080 -h "$output_folder"
+	else
+		echo "WARNING: busybox (used for HTTP hosting) not found, falling back on the file-system." 1>&2
+		echo "You may open the browser on 'file://${output_folder}/'."
+	fi
 }
 
 check_deps
