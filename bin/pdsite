@@ -140,6 +140,16 @@ function build() {
 		exit 1
 	fi
 
+	# Set up output folder
+	if [ -d $output_folder ]; then
+		echo -n "Clearing old build folder..."
+		rm -rf $output_folder/*
+	else
+		echo -n "Creating new build folder..."
+		mkdir $output_folder
+	fi
+	echo " done."
+
 	theme_path=$themes_path/$theme
 	output_folder=$(readlink -f $output_folder)
 
@@ -153,16 +163,6 @@ function build() {
 	local_block_template=$output_folder/localtemplate.yml.tmp
 	local_block=local.yml.tmp
 	config_block=$output_folder/config.yml.tmp
-
-	# Set up output folder
-	if [ -d $output_folder ]; then
-		echo -n "Clearing old build folder..."
-		rm -r $output_folder/*
-	else
-		echo -n "Creating new build folder..."
-		mkdir $output_folder
-	fi
-	echo " done."
 
 	echo -n "Building site..."
 
