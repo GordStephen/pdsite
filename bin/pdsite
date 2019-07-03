@@ -1,5 +1,8 @@
 #! /usr/bin/env bash
 
+# Exit immediately on each error
+set -e
+
 script_path=$(readlink -f $0)
 themes_path=${script_path%/*}/../themes
 default_config=${script_path%/*}/../.pdsite.yml.default
@@ -240,8 +243,6 @@ function serve() {
 }
 
 check_deps
-
-set -e
 
 case $1 in
 	"init") init;;
