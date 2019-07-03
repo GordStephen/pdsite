@@ -233,7 +233,15 @@ function build() {
 	start_path="index.html"
 	if [ ! -e "${output_folder}/$start_path" ]; then
 		echo "WARNING: There is no index.html in the web-site root folder." 1>&2
+		# Choose an arbitrary *.html file from our output as start path
+		start_path=$(cd "$output_folder"; find -regex "\./.+\.html" | sort | head -n 1 | sed -e 's|^\./||')
+		if [ -z "$start_path" ]; then
+			echo "ERROR: There is no *.html in the generated web-site." 1>&2
+			exit 1
+		fi
 	fi
+	start_path_http=$(echo "$start_path" | sed -e 's|index\.html$||')
+
 	# Clean up
 	find -path "*.tmp" -type f -delete
 
@@ -249,11 +257,11 @@ function serve() {
 	build
 	if check_dep busybox 2> /dev/null
 	then
-		echo "Hosting with busybox on 'http://127.0.0.1:8080' (stop with Ctrl-C) ..."
+		echo "Hosting with busybox on 'http://127.0.0.1:8080/${start_path_http}' (stop with Ctrl-C) ..."
 		busybox httpd -f -p 127.0.0.1:8080 -h "$output_folder"
 	else
 		echo "WARNING: busybox (used for HTTP hosting) not found, falling back on the file-system." 1>&2
-		echo "You may open the browser on 'file://${output_folder}/'."
+		echo "You may open the browser on 'file://${output_folder}/${start_path}'."
 	fi
 }
 
