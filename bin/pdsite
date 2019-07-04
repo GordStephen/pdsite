@@ -38,10 +38,11 @@ function check_deps() {
 
 	# required
 	check_dep pandoc "to convert '*.md' -> '*.html'" \
-		; ret=$(($ret + $?))
+		|| ret=$(($ret + $?))
 
 	# optional
-	check_dep busybox "for local http hosting"
+	check_dep busybox  "for local http hosting" \
+		|| true
 
 	[ $ret -gt 0 ] && exit $ret
 	return $ret
