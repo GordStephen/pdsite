@@ -21,10 +21,10 @@ function print_help() {
 
 # Checks whether a binary we depend on is available
 function check_dep() {
-	ret=0
-	cmd_name="$1"
-	cmd_use_case="$2"
-	cmd_path=`which "$cmd_name"`
+	local ret=0
+	local cmd_name="$1"
+	local cmd_use_case="$2"
+	local cmd_path=`which "$cmd_name"`
 	if [ -z "$cmd_path" ]; then
 		ret=1
 		echo "Could not find dependency '$cmd_name', used ${cmd_use_case}." 1>&2
@@ -34,7 +34,7 @@ function check_dep() {
 
 # Checks whether our dependencies are available
 function check_deps() {
-	ret=0
+	local ret=0
 
 	# required
 	check_dep pandoc "to convert '*.md' -> '*.html'" \
@@ -72,8 +72,8 @@ function make_pretty() {
 }
 
 function get_config_var() {
-	var_name="$1"
-	value=$(cat $config_file | grep '^'"$var_name"':' | sed 's|^'"$var_name"':\s*\(.*\)$|\1|')
+	local var_name="$1"
+	local value=$(cat $config_file | grep '^'"$var_name"':' | sed 's|^'"$var_name"':\s*\(.*\)$|\1|')
 	[ "$value" ] || {
 		echo "ERROR: Missing config variable '$var_name' in .pdsite.yml" 1>&2
 		exit 1
@@ -86,8 +86,8 @@ function navi() {
 	echo -e '\n---'
 
 	# Match nothing
-	np_prev=""
-	np_open=0
+	local np_prev=""
+	local np_open=0
 	while read -r np
 	do
 		# Close finished sub-folders
@@ -103,13 +103,13 @@ function navi() {
 		do
 			# Adding one path element
 			# Generate path relative to site root
-			path="${np_prev}$(echo ${np:${#np_prev}} | sed -e 's|\(.\)/.*|\1|')"
+			local path="${np_prev}$(echo ${np:${#np_prev}} | sed -e 's|\(.\)/.*|\1|')"
 
 			# Generate pretty page name automatically
-			name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
+			local name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
 
-			path_rtf="$(echo $path | sed -e 's/^\.//')"
-			path_part=""
+			local path_rtf="$(echo $path | sed -e 's/^\.//')"
+			local path_part=""
 			[ -n "$path_rtf" ] && path_part='"path":"'$path_rtf'",'
 			echo '{"type":"directory","name":"'$name'",'$path_part'"contents":['
 			np_open=$(($np_open + 1))
