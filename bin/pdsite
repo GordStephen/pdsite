@@ -3,7 +3,7 @@
 # Exit immediately on each error
 set -e
 
-script_path=$(readlink -f $0)
+script_path=$(readlink -f "${BASH_SOURCE[0]}")
 themes_path=${script_path%/*}/../themes
 default_config=${script_path%/*}/../.pdsite.yml.default
 
