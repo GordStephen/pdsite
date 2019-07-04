@@ -147,7 +147,7 @@ function build() {
 		rm -rf $output_folder/*
 	else
 		echo -n "Creating new build folder..."
-		mkdir $output_folder
+		mkdir -p "$output_folder"
 	fi
 	echo " done."
 
