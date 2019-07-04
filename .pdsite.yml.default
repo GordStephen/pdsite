@@ -7,5 +7,7 @@ outputfolder: .html
 # Site-wide template variables
 
 sitename: "My pdsite"
+site-url: "https://myuser.gitlab.io"
+site-base-path: /myproject
 pagetitle-suffix: ""
 footer: "My pdsite footer"

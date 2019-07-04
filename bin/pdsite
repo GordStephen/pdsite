@@ -72,13 +72,15 @@ function make_pretty() {
 }
 
 function get_config_var() {
+	local ret=0
 	local var_name="$1"
 	local value=$(cat $config_file | grep '^'"$var_name"':' | sed 's|^'"$var_name"':\s*\(.*\)$|\1|')
 	[ "$value" ] || {
-		echo "ERROR: Missing config variable '$var_name' in .pdsite.yml" 1>&2
-		exit 1
+		echo "Missing config variable '$var_name' in .pdsite.yml" 1>&2
+		ret=1
 	}
 	echo -n "$value"
+	return $ret
 }
 
 # Generate global file structure for navigation templates
@@ -110,7 +112,7 @@ function navi() {
 
 			local path_rtf="$(echo $path | sed -e 's/^\.//')"
 			local path_part=""
-			[ -n "$path_rtf" ] && path_part='"path":"'$path_rtf'",'
+			[ -n "$path_rtf" ] && path_part='"path":"'$link_prefix$path_rtf'",'
 			echo '{"type":"directory","name":"'$name'",'$path_part'"contents":['
 			np_open=$(($np_open + 1))
 
@@ -129,6 +131,13 @@ function navi() {
 }
 
 function build() {
+	local build_local=false
+	if [ "$1" == "--local" ]; then
+		build_local=true
+		echo "Build property: local='$build_local'"
+	fi
+
+	link_prefix=""
 
 	# Load config variables from file
 	if [ -f ./.pdsite.yml ]; then
@@ -136,6 +145,9 @@ function build() {
 		theme=$(get_config_var 'theme')
 		input_extension=$(get_config_var 'inputextension')
 		output_folder=$(get_config_var 'outputfolder')
+		site_url=$(get_config_var 'site-url' || true)
+		site_base_path=$(get_config_var 'site-base-path' || true)
+		[ "$build_local" != "true" ] && link_prefix="$site_base_path"
 	else
 		echo "ERROR: .pdsite.yml configuration file not found" 1>&2
 		exit 1
@@ -152,7 +164,7 @@ function build() {
 	echo " done."
 
 	theme_path=$themes_path/$theme
-	output_folder=$(readlink -f $output_folder)
+	output_folder=$(cd $output_folder; pwd)
 
 	# Build glob expressions
 	extension_glob='*'$input_extension
@@ -255,7 +267,7 @@ function build() {
 }
 
 function serve() {
-	build
+	build --local
 	if check_dep busybox 2> /dev/null
 	then
 		echo "Hosting with busybox on 'http://127.0.0.1:8080/${start_path_http}' (stop with Ctrl-C) ..."
@@ -268,10 +280,12 @@ function serve() {
 
 check_deps
 
-case $1 in
-	"init") init;;
-	"build") build;;
-	"serve") serve;;
+cmd=$1
+shift
+case $cmd in
+	"init") init $@;;
+	"build") build $@;;
+	"serve") serve $@;;
 	*)
 		echo "Unknown command '$1'" 1>&2
 		print_help

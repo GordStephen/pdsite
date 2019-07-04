@@ -32,6 +32,8 @@ outputfolder: .html
 
 bootswatch: lumen 
 sitename: "pdsite"
+site-url: "https://pdsite.org"
+site-base-path:
 pagetitle-suffix: "Pandoc-backed static site generator"
 footer: '<a class="navbar-link" href="https://github.com/GordStephen/pdsite">GitHub Repo</a> | <a class="navbar-link" href="https://github.com/GordStephen/pdsite/issues">Report an Issue</a>'
 ```
