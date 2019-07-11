@@ -4,8 +4,8 @@
 set -e
 
 script_path=$(readlink -f "${BASH_SOURCE[0]}")
-themes_path=${script_path%/*}/../themes
-default_config=${script_path%/*}/../.pdsite.yml.default
+themes_path="${script_path%/*}/../themes"
+default_config="${script_path%/*}/../.pdsite.yml.default"
 
 function print_help() {
 	echo "`basename $0` - Simple static site generator, written in BASH, using pandoc."
@@ -183,19 +183,19 @@ function build() {
 	fi
 	echo " done."
 
-	theme_path=$themes_path/$theme
-	output_folder=$(cd $output_folder; pwd)
+	theme_path="$themes_path/$theme"
+	output_folder=$(cd "$output_folder"; pwd)
 
 	# Build glob expressions
 	extension_glob='*'$input_extension
 	index_file_glob='*index'$input_extension
 
 	# Define temporary file locations
-	global_tree=$output_folder/tree.yml.tmp
-	local_tree=local_tree.yml.tmp
-	local_block_template=$output_folder/localtemplate.yml.tmp
-	local_block=local.yml.tmp
-	config_block=$output_folder/config.yml.tmp
+	global_tree="$output_folder/tree.yml.tmp"
+	local_tree="local_tree.yml.tmp"
+	local_block_template="$output_folder/localtemplate.yml.tmp"
+	local_block="local.yml.tmp"
+	config_block="$output_folder/config.yml.tmp"
 
 	echo -n "Building site..."
 
@@ -244,23 +244,21 @@ function build() {
 
 	# Generate local YAML
 	find -path "$index_file_glob" -type f | while read line; do
-
 		relpath=${line%/*}
 		site_path_abs=$(echo $relpath | cut -c 2-)
 
 		# Create local YAML block with auto-generated page name
 		name=$(echo ${relpath##*/} | make_pretty)
-		sed 's|^pagename: _$|pagename: '"$name"'|' $local_block_template > $relpath/$local_block
+		sed 's|^pagename: _$|pagename: '"$name"'|' "$local_block_template" > "$relpath/$local_block"
 
 		# Create local YAML block with context-aware file tree data
-		sed 's|"path":"'$site_path_abs'",|\0"active":y,|' $global_tree > $relpath/$local_tree
-
+		sed 's|"path":"'$site_path_abs'",|\0"active":y,|' "$global_tree" > "$relpath/$local_tree"
 	done
 
 	# Convert content files to context-aware HTML
 	find -not -path "${output_folder}*" -path "$index_file_glob" -type f \
-		-execdir pandoc --template $theme_path/template.html --toc -o index.html \
-			{} $local_tree $local_block $config_block \; -delete
+		-execdir pandoc --template "$theme_path/template.html" --toc -o index.html \
+			{} "$local_tree" "$local_block" "$config_block" \; -delete
 
 	# Check if site has a usable structure
 	start_path="index.html"
