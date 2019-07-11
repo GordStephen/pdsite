@@ -14,9 +14,10 @@ function print_help() {
 	echo "   `basename $0` command"
 	echo
 	echo "Commands:"
-	echo "   init	 initializes a new pdsite project in the current directory"
-	echo "   build	builds the static site in the current directory"
-	echo "   serve	serves the static site in the current directory on a local webserver"
+	echo "   -h, --help, help  print this help message and exit"
+	echo "   init              initializes a new pdsite project in the current directory"
+	echo "   build             builds the static site in the current directory"
+	echo "   serve             serves the static site in the current directory on a local webserver"
 }
 
 # Checks whether a binary we depend on is available
@@ -314,9 +315,10 @@ check_deps
 cmd=$1
 shift
 case $cmd in
-	"init") init $@;;
-	"build") build $@;;
-	"serve") serve $@;;
+	-h|--help|help) print_help;;
+	init) init $@;;
+	build) build $@;;
+	serve) serve $@;;
 	*)
 		echo "Unknown command '$1'" 1>&2
 		print_help
