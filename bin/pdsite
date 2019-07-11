@@ -83,6 +83,26 @@ function get_config_var() {
 	return $ret
 }
 
+function find_source_files_navi() {
+	find . -not -path "*/\.*" -name "$extension_glob" -type f
+}
+
+function find_source_files() {
+	find . -not -path "*/\.*" -not -path "${out_exclude}*" -name "$extension_glob" -type f
+}
+
+function find_index_source_files() {
+	find . -not -path "*/\.*" -not -path "${out_exclude}*" -path "$index_file_glob" -type f
+}
+
+function find_non_index_source_files() {
+	find . -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$index_file_glob" -path "$extension_glob" -type f
+}
+
+function find_source_dirs() {
+	find . -not -path "*/\.*" -not -path "${out_exclude}*" -type d
+}
+
 # Generate global file structure for navigation templates
 function navi() {
 	echo -e '\n---'
@@ -118,7 +138,7 @@ function navi() {
 
 			np_prev="$path"
 		done
-	done < <(find . -not -path "*/\.*" -name "$extension_glob" -type f | xargs dirname | sort | uniq)
+	done < <(find_source_files_navi | xargs dirname | sort | uniq)
 
 	# Close remaining folders
 	while [ $np_open -gt 0 ]
@@ -191,16 +211,16 @@ function build() {
 	[[ "$output_folder" == `pwd`* ]] && out_exclude='.'${output_folder#"`pwd`"}
 
 	# Generate base file structure
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -type d \
+	find_source_dirs \
 		| make_slug \
 		| xargs -I path mkdir -p "$output_folder"/path
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$index_file_glob" -path "$extension_glob" -type f \
+	find_non_index_source_files \
 		| sed 's|\(.*\)\..*|\1|' \
 		| make_slug \
 		| xargs -I path mkdir -p $output_folder/path
 
 	# Copy in index files
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -path "$index_file_glob" -type f \
+	find_index_source_files \
 		| while read in_path
 	do
 		out_path=$(echo $in_path | make_slug)
@@ -208,7 +228,7 @@ function build() {
 	done
 
 	# Copy in other content files
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$index_file_glob" -path "$extension_glob" -type f \
+	find_non_index_source_files \
 		| while read in_path
 	do
 		out_path=$(echo $in_path | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | make_slug)
