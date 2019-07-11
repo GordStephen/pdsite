@@ -65,6 +65,10 @@ function make_slug() {
 		| tr ' _' '-'
 }
 
+function simplify_path() {
+	echo -n "$1" | sed -e 's/[^-_.~a-zA-Z0-9/]/_/g'
+}
+
 # Define human-readable page title creation from web-safe filenames
 function make_pretty() {
 	tr '-' ' ' \
@@ -128,7 +132,11 @@ function navi() {
 			local path="${np_prev}$(echo ${np:${#np_prev}} | sed -e 's|\(.\)/.*|\1|')"
 
 			# Generate pretty page name automatically
-			local name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
+			local name=$(grep "^title:" "$path/index.md" | head -n 1 | sed -e 's|^title:[[:space:]]*||')
+			if [ -z "$name" ]
+			then
+				name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
+			fi
 
 			local path_rtf="$(echo $path | sed -e 's/^\.//')"
 			local path_part=""
@@ -138,7 +146,7 @@ function navi() {
 
 			np_prev="$path"
 		done
-	done < <(find_source_files_navi | xargs dirname | sort | uniq)
+	done < <(find_source_files_navi | tr '\n' '\0' | xargs -0 dirname | sort | uniq)
 
 	# Close remaining folders
 	while [ $np_open -gt 0 ]
@@ -213,30 +221,35 @@ function build() {
 	# Generate base file structure
 	find_source_dirs \
 		| make_slug \
-		| xargs -I path mkdir -p "$output_folder"/path
+		| while read in_path
+	do
+		mkdir -p "$output_folder/$(simplify_path $in_path)"
+	done
 	find_non_index_source_files \
 		| sed 's|\(.*\)\..*|\1|' \
 		| make_slug \
-		| xargs -I path mkdir -p $output_folder/path
+		| while read in_path
+	do
+		mkdir -p "$output_folder/$(simplify_path $in_path)"
+	done
 
 	# Copy in index files
 	find_index_source_files \
 		| while read in_path
 	do
-		out_path=$(echo $in_path | make_slug)
+		out_path=$(simplify_path "$(echo $in_path | make_slug)")
 		cp "$in_path" "$output_folder/$out_path"
 	done
 
 	# Copy in other content files
-	find_non_index_source_files \
-		| while read in_path
+	find_non_index_source_files | while read in_path
 	do
-		out_path=$(echo $in_path | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | make_slug)
-		cp "$in_path" "$output_folder"/"$out_path"
+		out_path=$(simplify_path $(echo $in_path | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | make_slug))
+		cp "$in_path" "$output_folder/$out_path"
 	done
 
 	# Copy in other (non-written-content) files
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$extension_glob" -type f -exec cp {} "$output_folder"/{} \;
+	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$extension_glob" -type f -exec cp {} "$output_folder"/$(simplify_path {}) \;
 
 	cd "$output_folder"
 
@@ -278,8 +291,8 @@ function build() {
 
 	# Copy in theme assets
 	cd "$theme_path"
-	find -not -path "." -type d -exec mkdir -p "$output_folder"/{} \;
-	find -not -path "./template.html" -type f -exec cp {} "$output_folder"/{} \;
+	find -not -path "." -type d -exec mkdir -p "$output_folder"/$(simplify_path {}) \;
+	find -not -path "./template.html" -type f -exec cp {} "$output_folder"/$(simplify_path {}) \;
 
 	echo " done."
 }
