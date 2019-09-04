@@ -1,7 +1,8 @@
 #! /usr/bin/env bash
 
-# Exit immediately on each error
-set -e
+# Exit immediately on each error and unset variable;
+# see: https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -Eeuo pipefail
 
 script_path=$(readlink -f "${BASH_SOURCE[0]}")
 themes_path="${script_path%/*}/../themes"
