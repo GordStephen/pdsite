@@ -93,7 +93,7 @@ function find_source_files_navi() {
 }
 
 function find_source_files() {
-	find . -not -path "*/\.*" -not -path "${out_exclude}*" -name "$extension_glob" -type f
+	find . -not -path "*/\.*" -not -path "${out_exclude}*" -not -regex ".*/\(README\|LICENSE\|COPYING\|TODO\|AUTHORS\)$extension_glob" -name "*$extension_glob" -type f
 }
 
 function find_index_source_files() {
@@ -101,7 +101,7 @@ function find_index_source_files() {
 }
 
 function find_non_index_source_files() {
-	find . -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$index_file_glob" -path "$extension_glob" -type f
+	find . -not -path "*/\.*" -not -path "${out_exclude}*" -not -regex ".*/\(README\|LICENSE\|COPYING\|TODO\|AUTHORS\)$extension_glob" -not -path "$index_file_glob" -path "$extension_glob" -type f
 }
 
 function find_source_dirs() {
