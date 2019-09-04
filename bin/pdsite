@@ -133,7 +133,7 @@ function navi() {
 			local path="${np_prev}$(echo ${np:${#np_prev}} | sed -e 's|\(.\)/.*|\1|')"
 
 			# Generate pretty page name automatically
-			local name=$(grep "^title:" "$path/index.md" | head -n 1 | sed -e 's|^title:[[:space:]]*||')
+			local name=$(grep "^title:" "$path/index.md" 2> /dev/null || echo "" | head -n 1 | sed -e 's|^title:[[:space:]]*||')
 			if [ -z "$name" ]
 			then
 				name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
