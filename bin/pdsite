@@ -11,13 +11,21 @@ function print_help() {
 	echo "`basename $0` - Simple static site generator, written in BASH, using pandoc."
 	echo
 	echo "Usage:"
-	echo "   `basename $0` command"
+	echo "   `basename $0` command [OPTION...]"
 	echo
 	echo "Commands:"
-	echo "   -h, --help, help  print this help message and exit"
-	echo "   init              initializes a new pdsite project in the current directory"
-	echo "   build             builds the static site in the current directory"
-	echo "   serve             serves the static site in the current directory on a local webserver"
+	echo "  help, -h, --help  print this help message and exit"
+	echo "  init              initializes a new pdsite project in the current directory"
+	echo "  build             builds the static site in the current directory"
+	echo "  serve             serves the static site in the current directory on a local webserver"
+	echo
+	echo "Options:"
+	echo "  -h, --help                   print this help message and exit"
+	echo "  -t, --theme <theme>          set the name of the theme"
+	echo "  -i, --input-ext <ext>        set the input extension (for example \".md\")"
+	echo "  -o, --output-folder <path>   set the path to the output folder"
+	echo "  -u, --site-url <url>         set the sites base URL (for example \"https://www.mysite.com\")"
+	echo "  -p, --site-base-path <path>  set the sites base path (for example \"/base/path\")"
 }
 
 # Checks whether a binary we depend on is available
@@ -74,6 +82,21 @@ function simplify_path() {
 function make_pretty() {
 	tr '-' ' ' \
 		| awk '{ for (i = 1; i <= NF; i++) { $i = toupper(substr($i, 1, 1)) substr($i, 2) }} 1'
+}
+
+# Check whether a shell variable is set
+_var_set() {
+	set | grep '^'"$1"'=' > /dev/null
+}
+
+# Set a shell variable if it is yet unset
+_set_if_unset() {
+	_var_name="$1"
+	shift
+	if ! _var_set "$_var_name"
+	then
+		eval "$_var_name='$@'"
+	fi
 }
 
 function get_config_var() {
@@ -168,19 +191,57 @@ function build() {
 
 	link_prefix=""
 
+	while [ -n "${1:-}" ]
+	do
+		swt=$1
+		shift
+		case $swt in
+			-t|--theme)
+				theme="$1"
+				shift
+				;;
+			-i|--input-ext)
+				input_extension="$1"
+				shift
+				;;
+			-o|--output-folder)
+				output_folder="$1"
+				shift
+				;;
+			-u|--site-url)
+				site_url="$1"
+				shift
+				;;
+			-p|--site-base-path)
+				site_base_path="$1"
+				shift
+				;;
+			*)
+				echo "Unknown switch '$1'" 1>&2
+				print_help
+				exit 1
+				;;
+		esac
+	done
+
 	# Load config variables from file
-	if [ -f ./.pdsite.yml ]; then
-		config_file=$(pwd)'/.pdsite.yml'
-		theme=$(get_config_var 'theme')
-		input_extension=$(get_config_var 'inputextension')
-		output_folder=$(get_config_var 'outputfolder')
-		site_url=$(get_config_var 'site-url' || true)
-		site_base_path=$(get_config_var 'site-base-path' || true)
-		[ "$build_local" != "true" ] && link_prefix="$site_base_path"
+	config_file=$(pwd)'/.pdsite.yml'
+	if [ -f "$config_file" ]; then
+		_set_if_unset theme "$(get_config_var 'theme')"
+		_set_if_unset input_extension "$(get_config_var 'inputextension')"
+		_set_if_unset output_folder "$(get_config_var 'outputfolder')"
+		_set_if_unset site_url "$(get_config_var 'site-url' || true)"
+		_set_if_unset site_base_path "$(get_config_var 'site-base-path' || true)"
 	else
-		echo "ERROR: .pdsite.yml configuration file not found" 1>&2
-		exit 1
+		echo "WARNING: '.pdsite.yml' configuration file not found." 1>&2
+		echo "         Using default and command line supplied values" 1>&2
 	fi
+	_set_if_unset theme "default"
+	_set_if_unset input_extension ".md"
+	_set_if_unset output_folder "build"
+	_set_if_unset site_url ""
+	_set_if_unset site_base_path ""
+	[ "$build_local" != "true" ] && link_prefix="$site_base_path"
 
 	# Set up output folder
 	if [ -d $output_folder ]; then
@@ -209,7 +270,12 @@ function build() {
 	echo "Building site..."
 
 	echo -e "\n---" > $config_block
-	cat $config_file >> $config_block
+	#cat $config_file >> $config_block
+	echo "theme: $theme" >> $config_block
+	echo "inputextension: $input_extension" >> $config_block
+	echo "outputfolder: $output_folder" >> $config_block
+	echo "site-url: $site_url" >> $config_block
+	echo "site-base-path: $site_base_path" >> $config_block
 	echo -e "...\n" >> $config_block
 
 	echo -e "\n---\npagenameintitle: y\npagename: _\n...\n" > $local_block_template
@@ -300,7 +366,7 @@ function build() {
 }
 
 function serve() {
-	build --local
+	build --local $@
 	if check_dep busybox 2> /dev/null
 	then
 		echo "Hosting with busybox on 'http://127.0.0.1:8080/${start_path_http}' (stop with Ctrl-C) ..."
