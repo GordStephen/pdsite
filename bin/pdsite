@@ -141,7 +141,7 @@ function navi() {
 	while read -r np
 	do
 		# Close finished sub-folders
-		while [[ "$np" != $np_prev* ]]
+		while [[ "$np" != "$np_prev"* ]]
 		do
 			echo "]},"
 			np_open=$(($np_open - 1))
@@ -316,7 +316,7 @@ function build() {
 	done
 
 	echo "Copy in other (non-written-content) files ..."
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$extension_glob" -type f -exec cp {} "$output_folder"/$(simplify_path {}) \;
+	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "*$extension_glob" -type f -exec cp {} "$output_folder"/$(simplify_path {}) \;
 
 	cd "$output_folder"
 
