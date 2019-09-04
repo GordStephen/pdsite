@@ -315,10 +315,18 @@ check_deps
 cmd=$1
 shift
 case $cmd in
-	-h|--help|help) print_help;;
-	init) init $@;;
-	build) build $@;;
-	serve) serve $@;;
+	-h|--help|help)
+		print_help
+		;;
+	init)
+		init $@
+		;;
+	build)
+		build $@
+		;;
+	serve)
+		serve $@
+		;;
 	*)
 		echo "Unknown command '$1'" 1>&2
 		print_help
