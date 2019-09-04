@@ -206,7 +206,7 @@ function build() {
 	local_block="local.yml.tmp"
 	config_block="$output_folder/config.yml.tmp"
 
-	echo -n "Building site..."
+	echo "Building site..."
 
 	echo -e "\n---" > $config_block
 	cat $config_file >> $config_block
@@ -219,7 +219,7 @@ function build() {
 	# If the output folder is contained within the source folder, exclude it
 	[[ "$output_folder" == `pwd`* ]] && out_exclude='.'${output_folder#"`pwd`"}
 
-	# Generate base file structure
+	echo "Generate base file structure ..."
 	find_source_dirs \
 		| make_slug \
 		| while read in_path
@@ -234,7 +234,7 @@ function build() {
 		mkdir -p "$output_folder/$(simplify_path $in_path)"
 	done
 
-	# Copy in index files
+	echo "Copy in index files ..."
 	find_index_source_files \
 		| while read in_path
 	do
@@ -242,21 +242,22 @@ function build() {
 		cp "$in_path" "$output_folder/$out_path"
 	done
 
-	# Copy in other content files
+	echo "Copy in other content files ..."
 	find_non_index_source_files | while read in_path
 	do
 		out_path=$(simplify_path $(echo $in_path | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | make_slug))
 		cp "$in_path" "$output_folder/$out_path"
 	done
 
-	# Copy in other (non-written-content) files
+	echo "Copy in other (non-written-content) files ..."
 	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "$extension_glob" -type f -exec cp {} "$output_folder"/$(simplify_path {}) \;
 
 	cd "$output_folder"
 
+	echo "Generating the navigation menu JSON file ..."
 	navi > $global_tree
 
-	# Generate local YAML
+	echo "Generate local YAML ..."
 	find -path "$index_file_glob" -type f | while read line; do
 		relpath=${line%/*}
 		site_path_abs=$(echo $relpath | cut -c 2-)
@@ -269,12 +270,12 @@ function build() {
 		sed 's|"path":"'$site_path_abs'",|\0"active":y,|' "$global_tree" > "$relpath/$local_tree"
 	done
 
-	# Convert content files to context-aware HTML
+	echo "Convert content files to context-aware HTML ..."
 	find -not -path "${output_folder}*" -path "$index_file_glob" -type f \
 		-execdir pandoc --template "$theme_path/template.html" --toc -o index.html \
 			{} "$local_tree" "$local_block" "$config_block" \; -delete
 
-	# Check if site has a usable structure
+	echo "Check if site has a usable structure ..."
 	start_path="index.html"
 	if [ ! -e "${output_folder}/$start_path" ]; then
 		echo "WARNING: There is no index.html in the web-site root folder." 1>&2
@@ -287,15 +288,15 @@ function build() {
 	fi
 	start_path_http=$(echo "$start_path" | sed -e 's|index\.html$||')
 
-	# Clean up
+	echo "Clean up ..."
 	find -path "*.tmp" -type f -delete
 
-	# Copy in theme assets
+	echo "Copy in theme assets ..."
 	cd "$theme_path"
 	find -not -path "." -type d -exec mkdir -p "$output_folder"/$(simplify_path {}) \;
 	find -not -path "./template.html" -type f -exec cp {} "$output_folder"/$(simplify_path {}) \;
 
-	echo " done."
+	echo "done."
 }
 
 function serve() {
