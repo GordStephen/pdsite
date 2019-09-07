@@ -185,7 +185,7 @@ function navi() {
 
 function build() {
 	local build_local=false
-	if [ "$1" == "--local" ]; then
+	if [ "${1:-}" == "--local" ]; then
 		build_local=true
 		echo "Build property: local='$build_local'"
 	fi
@@ -380,7 +380,7 @@ function serve() {
 
 check_deps
 
-cmd=$1
+cmd=${1:-}
 shift
 case $cmd in
 	-h|--help|help)
@@ -396,7 +396,7 @@ case $cmd in
 		serve $@
 		;;
 	*)
-		echo "Unknown command '$1'" 1>&2
+		echo "Unknown command '$cmd'" 1>&2
 		print_help
 		exit 1
 		;;
