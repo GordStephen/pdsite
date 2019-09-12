@@ -76,7 +76,7 @@ function make_slug() {
 }
 
 function simplify_path() {
-	echo -n "$1" | sed -e 's/[^-_.~a-zA-Z0-9/]/_/g'
+	echo -n "$@" | sed -e 's/[^-_.~a-zA-Z0-9/]/_/g'
 }
 
 # Define human-readable page title creation from web-safe filenames
