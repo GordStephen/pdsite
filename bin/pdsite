@@ -317,7 +317,14 @@ function build() {
 	done
 
 	echo "Copy in other (non-written-content) files ..."
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "*$extension_glob" -type f -exec cp {} "$output_folder"/$(simplify_path {}) \;
+	export simplify_path
+	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "*$extension_glob" -type f | while read file_path
+	do
+		new_dir=$(dirname "$file_path")
+		new_dir=$(simplify_path "$new_dir")
+		new_file=$(basename "$file_path")
+		cp "$file_path" "$output_folder/$new_dir/$new_file"
+	done
 
 	cd "$output_folder"
 
@@ -360,8 +367,18 @@ function build() {
 
 	echo "Copy in theme assets ..."
 	cd "$theme_path"
-	find -not -path "." -type d -exec mkdir -p "$output_folder"/$(simplify_path {}) \;
-	find -not -path "./template.html" -type f -exec cp {} "$output_folder"/$(simplify_path {}) \;
+	find -not -path "." -type d | while read dir_path
+	do
+		new_dir=$(simplify_path "$dir_path")
+		mkdir -p "$output_folder/$new_dir"
+	done
+	find -not -path "./template.html" -type f | while read file_path
+	do
+		new_dir=$(dirname "$file_path")
+		new_dir=$(simplify_path "$new_dir")
+		new_file=$(basename "$file_path")
+		cp "$file_path" "$output_folder/$new_dir/$new_file"
+	done
 
 	echo "done."
 }
