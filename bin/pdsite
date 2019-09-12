@@ -33,7 +33,7 @@ function print_help() {
 function check_dep() {
 	local ret=0
 	local cmd_name="$1"
-	local cmd_use_case="$2"
+	local cmd_use_case="${2:-}"
 	local cmd_path=`which "$cmd_name"`
 	if [ -z "$cmd_path" ]; then
 		ret=1
@@ -185,11 +185,6 @@ function navi() {
 
 function build() {
 	local build_local=false
-	if [ "${1:-}" == "--local" ]; then
-		build_local=true
-		echo "Build property: local='$build_local'"
-	fi
-
 	link_prefix=""
 
 	while [ -n "${1:-}" ]
@@ -197,6 +192,9 @@ function build() {
 		swt=$1
 		shift
 		case $swt in
+			-l|--local)
+				build_local=true
+				;;
 			-t|--theme)
 				theme="$1"
 				shift
@@ -224,6 +222,8 @@ function build() {
 				;;
 		esac
 	done
+
+	echo "Build property: local='$build_local'"
 
 	# Load config variables from file
 	config_file=$(pwd)'/.pdsite.yml'
