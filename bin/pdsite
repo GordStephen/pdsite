@@ -90,13 +90,21 @@ _var_set() {
 	set | grep '^'"$1"'=' > /dev/null
 }
 
+# Remove quotes if present
+_remove_quotes() {
+	_val="$1"
+	temp="${_val%\"}"
+	temp="${temp#\"}"
+	echo "$temp"
+}
+
 # Set a shell variable if it is yet unset
 _set_if_unset() {
 	_var_name="$1"
 	shift
 	if ! _var_set "$_var_name"
 	then
-		eval "$_var_name='$@'"
+		eval "$_var_name=`_remove_quotes "$@"`"
 	fi
 }
 
