@@ -5,9 +5,10 @@
 set -Eeuo pipefail
 
 script_path=$(readlink -f "${BASH_SOURCE[0]}")
-themes_path="${script_path%/*}/../themes"
-filters_path="${script_path%/*}/../filters"
-default_config="${script_path%/*}/../.pdsite.yml.default"
+install_path="${script_path%/*}/.."
+themes_path="${install_path}/themes"
+filters_path="${install_path}/filters"
+default_config="${install_path}/.pdsite.yml.default"
 
 function print_help() {
 	echo "`basename $0` - Simple static site generator, written in BASH, using pandoc."
