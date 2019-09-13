@@ -231,7 +231,7 @@ function build() {
 				shift
 				;;
 			*)
-				echo "Unknown switch '$1'" 1>&2
+				echo "Unknown switch '$swt'" 1>&2
 				print_help
 				exit 1
 				;;
