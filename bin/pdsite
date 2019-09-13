@@ -24,6 +24,7 @@ function print_help() {
 	echo
 	echo "Options:"
 	echo "  -h, --help                   print this help message and exit"
+	echo "  -l, --local                  build or server for a local run of the site (not using the URL and base path)"
 	echo "  -t, --theme <theme>          set the name of the theme"
 	echo "  -i, --input-ext <ext>        set the input extension (for example \".md\")"
 	echo "  -o, --output-folder <path>   set the path to the output folder"
