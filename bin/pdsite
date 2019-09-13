@@ -16,7 +16,7 @@ function print_help() {
 	echo "   `basename $0` command [OPTION...]"
 	echo
 	echo "Commands:"
-	echo "  help, -h, --help  print this help message and exit"
+	echo "  help, -h          print this help message and exit"
 	echo "  init              initializes a new pdsite project in the current directory"
 	echo "  build             builds the static site in the current directory"
 	echo "  serve             serves the static site in the current directory on a local webserver"
@@ -201,6 +201,10 @@ function build() {
 		swt=$1
 		shift
 		case $swt in
+			-h|--help)
+				print_help
+				exit 0
+				;;
 			-l|--local)
 				build_local=true
 				;;
@@ -412,6 +416,7 @@ shift
 case $cmd in
 	-h|--help|help)
 		print_help
+		exit 0
 		;;
 	init)
 		init $@
