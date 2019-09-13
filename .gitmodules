@@ -1,0 +1,3 @@
+[submodule "filters"]
+	path = filters
+	url = https://github.com/movedo/movedo-filters.git

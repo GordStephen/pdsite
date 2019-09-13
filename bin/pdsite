@@ -6,6 +6,7 @@ set -Eeuo pipefail
 
 script_path=$(readlink -f "${BASH_SOURCE[0]}")
 themes_path="${script_path%/*}/../themes"
+filters_path="${script_path%/*}/../filters"
 default_config="${script_path%/*}/../.pdsite.yml.default"
 
 function print_help() {
@@ -355,6 +356,7 @@ function build() {
 	echo "Convert content files to context-aware HTML ..."
 	find -not -path "${output_folder}*" -path "$index_file_glob" -type f \
 		-execdir pandoc --template "$theme_path/template.html" --toc -o index.html \
+			-M allp_prefix="../" --filter "$filters_path/add_local_link_prefix.py" \
 			{} "$local_tree" "$local_block" "$config_block" \; -delete
 
 	echo "Check if site has a usable structure ..."
