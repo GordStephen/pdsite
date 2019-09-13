@@ -18,18 +18,38 @@ function print_help() {
 	echo
 	echo "Commands:"
 	echo "  help, -h          print this help message and exit"
+	echo "  version, -v       print the tools version and exit"
 	echo "  init              initializes a new pdsite project in the current directory"
 	echo "  build             builds the static site in the current directory"
 	echo "  serve             serves the static site in the current directory on a local webserver"
 	echo
 	echo "Options:"
 	echo "  -h, --help                   print this help message and exit"
+	echo "  -v, --version                print the tools version and exit"
 	echo "  -l, --local                  build or server for a local run of the site (not using the URL and base path)"
 	echo "  -t, --theme <theme>          set the name of the theme"
 	echo "  -i, --input-ext <ext>        set the input extension (for example \".md\")"
 	echo "  -o, --output-folder <path>   set the path to the output folder"
 	echo "  -u, --site-url <url>         set the sites base URL (for example \"https://www.mysite.com\")"
 	echo "  -p, --site-base-path <path>  set the sites base path (for example \"/base/path\")"
+}
+
+function print_version() {
+	local ret=0
+	local git_version=$(cd "$install_path"; git describe --always --tags 2> /dev/null || true)
+	local file_version=$(cat VERSION 2> /dev/null || true)
+	if [ -n "$git_version" ]
+	then
+		version="$git_version"
+	elif [ -n "$file_version" ]
+	then
+		version="$file_version"
+	else
+		version="<UNKNOWN>"
+		ret=1
+	fi
+	echo "pdsite version: '$version'"
+	return $ret
 }
 
 # Checks whether a binary we depend on is available
@@ -205,6 +225,10 @@ function build() {
 		case $swt in
 			-h|--help)
 				print_help
+				exit 0
+				;;
+			-v|--version)
+				print_version
 				exit 0
 				;;
 			-l|--local)
@@ -418,6 +442,10 @@ shift
 case $cmd in
 	-h|--help|help)
 		print_help
+		exit 0
+		;;
+	-v|--version|version)
+		print_version
 		exit 0
 		;;
 	init)
