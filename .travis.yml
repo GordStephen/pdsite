@@ -6,7 +6,11 @@ addons:
   apt:
     packages:
     - pandoc
+    - python-pip
     - texlive-latex-base
+
+before_script:
+  - pip install panflute
 
 script:
   - cd docs
