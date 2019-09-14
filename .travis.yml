@@ -10,7 +10,7 @@ addons:
     - texlive-latex-base
 
 before_script:
-  - pip install --user panflute
+  - pip install --user panflute bs4
 
 script:
   - cd docs
