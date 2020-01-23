@@ -325,6 +325,8 @@ function build() {
 	# If the output folder is contained within the source folder, exclude it
 	[[ "$output_folder" == `pwd`* ]] && out_exclude='.'${output_folder#"`pwd`"}
 
+	export simplify_path
+
 	echo "Generate base file structure ..."
 	find_source_dirs \
 		| make_slug \
@@ -356,7 +358,6 @@ function build() {
 	done
 
 	echo "Copy in other (non-written-content) files ..."
-	export simplify_path
 	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "*$extension_glob" -type f | while read file_path
 	do
 		new_dir=$(dirname "$file_path")
