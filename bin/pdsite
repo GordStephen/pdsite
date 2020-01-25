@@ -373,7 +373,7 @@ function build() {
 	navi > $global_tree
 
 	echo "Generate local YAML ..."
-	find -path "$index_file_glob" -type f | while read line; do
+	find -not -path "${out_exclude}*" -path "$index_file_glob" -type f | while read line; do
 		relpath=${line%/*}
 		site_path_abs=$(echo $relpath | cut -c 2-)
 
