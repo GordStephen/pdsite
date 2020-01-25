@@ -363,6 +363,7 @@ function build() {
 		new_dir=$(dirname "$file_path")
 		new_dir=$(simplify_path "$new_dir")
 		new_file=$(basename "$file_path")
+		mkdir -p "$output_folder/$new_dir"
 		cp "$file_path" "$output_folder/$new_dir/$new_file"
 	done
 
