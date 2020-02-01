@@ -11,8 +11,8 @@ before_script:
   - pip3 install --user wheel
   - pip3 install --user panflute bs4
   # Make Python 3 the default, so pandoc will use it
-  - rm /usr/bin/python
-  - ln -s /usr/bin/python3 /usr/bin/python
+  - sudo rm /usr/bin/python
+  - sudo ln -s /usr/bin/python3 /usr/bin/python
 
 script:
   - cd docs
