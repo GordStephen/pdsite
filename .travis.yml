@@ -11,6 +11,7 @@ addons:
     - texlive-latex-base
 
 before_script:
+  - pip3 install --user wheel
   - pip3 install --user panflute bs4
 
 script:
