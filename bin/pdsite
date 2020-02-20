@@ -399,6 +399,10 @@ function build() {
 			-M allp_prefix="../" \
 			-M allp_file="$index_md_local" \
 			--filter "$filters_path/add_local_link_prefix.py" \
+			-M rls_relative_only=True \
+			-M rls_ext_from=".md" \
+			-M rls_ext_to=".html" \
+			--filter "$filters_path/replace_link_suffixes.py" \
 			"$index_md_local" "$local_tree" "$local_block" "$config_block"
 		cd "$dir_before"
 		rm "$index_md"
