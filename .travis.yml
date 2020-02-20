@@ -13,6 +13,7 @@ before_script:
   # Make Python 3 the default, so pandoc will use it
   - sudo rm /usr/bin/python
   - sudo ln -s /usr/bin/python3 /usr/bin/python
+  - python --version
 
 script:
   - cd docs
