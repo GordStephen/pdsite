@@ -387,9 +387,21 @@ function build() {
 
 	echo "Convert content files to context-aware HTML ..."
 	find -not -path "${output_folder}*" -path "$index_file_glob" -type f \
-		-execdir pandoc --template "$theme_path/template.html" --toc -o index.html \
-			-M allp_prefix="../" --filter "$filters_path/add_local_link_prefix.py" \
-			{} "$local_tree" "$local_block" "$config_block" \; -delete
+		| while read index_md
+	do
+		dir_before="$(pwd)"
+		cd "$(dirname "$index_md")"
+		index_md_local="$(basename "$index_md")"
+		pandoc \
+			--template "$theme_path/template.html" \
+			--toc \
+			-o index.html \
+			-M allp_prefix="../" \
+			--filter "$filters_path/add_local_link_prefix.py" \
+			"$index_md_local" "$local_tree" "$local_block" "$config_block"
+		cd "$dir_before"
+		rm "$index_md"
+	done
 
 	echo "Check if site has a usable structure ..."
 	start_path="index.html"
