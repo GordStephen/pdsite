@@ -397,6 +397,7 @@ function build() {
 			--toc \
 			-o index.html \
 			-M allp_prefix="../" \
+			-M allp_file="$index_md_local" \
 			--filter "$filters_path/add_local_link_prefix.py" \
 			"$index_md_local" "$local_tree" "$local_block" "$config_block"
 		cd "$dir_before"
