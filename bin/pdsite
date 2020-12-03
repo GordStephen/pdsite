@@ -11,10 +11,10 @@ filters_path="${install_path}/filters"
 default_config="${install_path}/.pdsite.yml.default"
 
 function print_help() {
-	echo "`basename $0` - Simple static site generator, written in BASH, using pandoc."
+	echo "$(basename "$0") - Simple static site generator, written in BASH, using pandoc."
 	echo
 	echo "Usage:"
-	echo "   `basename $0` command [OPTION...]"
+	echo "   $(basename "$0") command [OPTION...]"
 	echo
 	echo "Commands:"
 	echo "  help, -h          print this help message and exit"
@@ -57,7 +57,7 @@ function check_dep() {
 	local ret=0
 	local cmd_name="$1"
 	local cmd_use_case="${2:-}"
-	local cmd_path=`which "$cmd_name"`
+	local cmd_path=$(which "$cmd_name")
 	if [ -z "$cmd_path" ]; then
 		ret=1
 		echo "Could not find dependency '$cmd_name', used ${cmd_use_case}." 1>&2
@@ -71,7 +71,7 @@ function check_deps() {
 
 	# required
 	check_dep pandoc "to convert '*.md' -> '*.html'" \
-		|| ret=$(($ret + $?))
+		|| ret=$((ret + $?))
 
 	# optional
 	check_dep busybox  "for local http hosting" \
@@ -83,7 +83,7 @@ function check_deps() {
 
 function init() {
 	if [ ! -e .pdsite.yml ]; then
-		cp $default_config .pdsite.yml
+		cp "$default_config" .pdsite.yml
 	else
 		echo "ERROR: .pdsite.yml is already present" 1>&2
 		exit 1
@@ -99,7 +99,7 @@ function make_slug() {
 }
 
 function simplify_path() {
-	echo -n "$@" | sed -e 's|^\./||' -e 's/[^-_.~a-zA-Z0-9/]/_/g'
+	echo -n "${@}" | sed -e 's|^\./||' -e 's/[^-_.~a-zA-Z0-9/]/_/g'
 }
 
 # Define human-readable page title creation from web-safe filenames
@@ -127,14 +127,14 @@ _set_if_unset() {
 	shift
 	if ! _var_set "$_var_name"
 	then
-		eval "$_var_name=`_remove_quotes "$@"`"
+		eval "$_var_name=$(_remove_quotes "${@}")"
 	fi
 }
 
 function get_config_var() {
 	local ret=0
 	local var_name="$1"
-	local value=$(cat $config_file | grep '^'"$var_name"':' | sed 's|^'"$var_name"':\s*\(.*\)$|\1|')
+	local value=$(grep '^'"$var_name"':' < "$config_file" | sed 's|^'"$var_name"':\s*\(.*\)$|\1|')
 	[ "$value" ] || {
 		echo "Missing config variable '$var_name' in .pdsite.yml" 1>&2
 		ret=1
@@ -176,7 +176,7 @@ function navi() {
 		while [[ "$np" != "$np_prev"* ]]
 		do
 			echo "]},"
-			np_open=$(($np_open - 1))
+			np_open=$((np_open - 1))
 			np_prev=$(dirname "$np_prev")
 		done
 
@@ -185,7 +185,7 @@ function navi() {
 		do
 			# Adding one path element
 			# Generate path relative to site root
-			local path="${np_prev}$(echo ${np:${#np_prev}} | sed -e 's|\(.\)/.*|\1|')"
+			local path="${np_prev}$(echo "${np:${#np_prev}}" | sed -e 's|\(.\)/.*|\1|')"
 
 			# Generate pretty page name automatically
 			local name=$(grep "^title:" "$path/index.md" 2> /dev/null | head -n 1 | sed -E -e 's|^title:[[:space:]]*||' || echo "")
@@ -194,11 +194,11 @@ function navi() {
 				name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
 			fi
 
-			local path_rtf="$(echo $path | sed -e 's/^\.//')"
+			local path_rtf="$(echo "$path" | sed -e 's/^\.//')"
 			local path_part=""
 			[ -n "$path_rtf" ] && path_part='"path":"'$link_prefix$path_rtf'",'
-			echo '{"type":"directory","name":"'$name'",'$path_part'"contents":['
-			np_open=$(($np_open + 1))
+			echo '{"type":"directory","name":"'"$name"'",'"$path_part"'"contents":['
+			np_open=$((np_open + 1))
 
 			np_prev="$path"
 		done
@@ -208,7 +208,7 @@ function navi() {
 	while [ $np_open -gt 0 ]
 	do
 		echo "]}"
-		np_open=$(($np_open - 1))
+		np_open=$((np_open - 1))
 	done
 
 	echo -e '...\n'
@@ -267,9 +267,9 @@ function build() {
 	# Load config variables from file
 	config_file=$(pwd)'/.pdsite.yml'
 	if [ -f "$config_file" ]; then
-		_set_if_unset theme "$(get_config_var 'theme')"
+		theme="${theme:-"$(get_config_var 'theme')"}"
 		_set_if_unset input_extension "$(get_config_var 'inputextension')"
-		_set_if_unset output_folder "$(get_config_var 'outputfolder')"
+		output_folder="${output_folder:-"$(get_config_var 'outputfolder')"}"
 		_set_if_unset site_url "$(get_config_var 'site-url' || true)"
 		_set_if_unset site_base_path "$(get_config_var 'site-base-path' || true)"
 	else
@@ -278,15 +278,15 @@ function build() {
 	fi
 	_set_if_unset theme "default"
 	_set_if_unset input_extension ".md"
-	_set_if_unset output_folder "build"
+	output_folder="${output_folder:-"build"}"
 	_set_if_unset site_url ""
 	_set_if_unset site_base_path ""
 	[ "$build_local" != "true" ] && link_prefix="$site_base_path"
 
 	# Set up output folder
-	if [ -d $output_folder ]; then
+	if [ -d "$output_folder" ]; then
 		echo -n "Clearing old build folder..."
-		rm -rf $output_folder/*
+		rm -rf "${output_folder:?}/"*
 	else
 		echo -n "Creating new build folder..."
 		mkdir -p "$output_folder"
@@ -309,56 +309,58 @@ function build() {
 
 	echo "Building site..."
 
-	echo -e "\n---" > $config_block
-	#cat $config_file >> $config_block
-	echo "theme: $theme" >> $config_block
-	echo "inputextension: $input_extension" >> $config_block
-	echo "outputfolder: $output_folder" >> $config_block
-	echo "site-url: $site_url" >> $config_block
-	echo "site-base-path: $site_base_path" >> $config_block
-	echo -e "...\n" >> $config_block
+	{
+		echo -e "\n---"
+		#cat $config_file
+		echo "theme: $theme"
+		echo "inputextension: $input_extension"
+		echo "outputfolder: $output_folder"
+		echo "site-url: $site_url"
+		echo "site-base-path: $site_base_path"
+		echo -e "...\n"
+	} > "$config_block"
 
-	echo -e "\n---\npagenameintitle: y\npagename: _\n...\n" > $local_block_template
+	echo -e "\n---\npagenameintitle: y\npagename: _\n...\n" > "$local_block_template"
 
 	# By default, match nothing
 	out_exclude="XXX_XXX_XXX"
 	# If the output folder is contained within the source folder, exclude it
-	[[ "$output_folder" == `pwd`* ]] && out_exclude='.'${output_folder#"`pwd`"}
+	[[ "$output_folder" == $(pwd)* ]] && out_exclude='.'${output_folder#"$(pwd)"}
 
 	export simplify_path
 
 	echo "Generate base file structure ..."
 	find_source_dirs \
 		| make_slug \
-		| while read in_path
+		| while read -r in_path
 	do
-		mkdir -p "$output_folder/$(simplify_path $in_path)"
+		mkdir -p "$output_folder/$(simplify_path "$in_path")"
 	done
 	find_non_index_source_files \
 		| sed 's|\(.*\)\..*|\1|' \
 		| make_slug \
-		| while read in_path
+		| while read -r in_path
 	do
-		mkdir -p "$output_folder/$(simplify_path $in_path)"
+		mkdir -p "$output_folder/$(simplify_path "$in_path")"
 	done
 
 	echo "Copy in index files ..."
 	find_index_source_files \
-		| while read in_path
+		| while read -r in_path
 	do
-		out_path=$(simplify_path "$(echo $in_path | make_slug)")
+		out_path=$(simplify_path "$(echo "$in_path" | make_slug)")
 		cp "$in_path" "$output_folder/$out_path"
 	done
 
 	echo "Copy in other content files ..."
-	find_non_index_source_files | while read in_path
+	find_non_index_source_files | while read -r in_path
 	do
-		out_path=$(simplify_path $(echo $in_path | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | make_slug))
+		out_path=$(simplify_path "$(echo "$in_path" | sed 's|\./\(.*\)\.\(.*\)|\1/index.\2|' | make_slug)")
 		cp "$in_path" "$output_folder/$out_path"
 	done
 
 	echo "Copy in other (non-written-content) files ..."
-	find -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "*$extension_glob" -type f | while read file_path
+	find . -not -path "*/\.*" -not -path "${out_exclude}*" -not -path "*$extension_glob" -type f | while read -r file_path
 	do
 		new_dir=$(dirname "$file_path")
 		new_dir=$(simplify_path "$new_dir")
@@ -370,24 +372,24 @@ function build() {
 	cd "$output_folder"
 
 	echo "Generating the navigation menu JSON file ..."
-	navi > $global_tree
+	navi > "$global_tree"
 
 	echo "Generate local YAML ..."
-	find -not -path "${out_exclude}*" -path "$index_file_glob" -type f | while read line; do
+	find . -not -path "${out_exclude}*" -path "$index_file_glob" -type f | while read -r line; do
 		relpath=${line%/*}
-		site_path_abs=$(echo $relpath | cut -c 2-)
+		site_path_abs=$(echo "$relpath" | cut -c 2-)
 
 		# Create local YAML block with auto-generated page name
-		name=$(echo ${relpath##*/} | make_pretty)
+		name=$(echo "${relpath##*/}" | make_pretty)
 		sed 's|^pagename: _$|pagename: '"$name"'|' "$local_block_template" > "$relpath/$local_block"
 
 		# Create local YAML block with context-aware file tree data
-		sed 's|"path":"'$site_path_abs'",|\0"active":y,|' "$global_tree" > "$relpath/$local_tree"
+		sed 's|"path":"'"$site_path_abs"'",|\0"active":y,|' "$global_tree" > "$relpath/$local_tree"
 	done
 
 	echo "Convert content files to context-aware HTML ..."
-	find -not -path "${output_folder}*" -path "$index_file_glob" -type f \
-		| while read index_md
+	find . -not -path "${output_folder}*" -path "$index_file_glob" -type f \
+		| while read -r index_md
 	do
 		dir_before="$(pwd)"
 		cd "$(dirname "$index_md")"
@@ -413,7 +415,7 @@ function build() {
 	if [ ! -e "${output_folder}/$start_path" ]; then
 		echo "WARNING: There is no index.html in the web-site root folder." 1>&2
 		# Choose an arbitrary *.html file from our output as start path
-		start_path=$(cd "$output_folder"; find -regex "\./.+\.html" | sort | head -n 1 | sed -e 's|^\./||')
+		start_path=$(cd "$output_folder"; find . -regex "\./.+\.html" | sort | head -n 1 | sed -e 's|^\./||')
 		if [ -z "$start_path" ]; then
 			echo "ERROR: There is no *.html in the generated web-site." 1>&2
 			exit 1
@@ -422,16 +424,16 @@ function build() {
 	start_path_http=$(echo "$start_path" | sed -e 's|index\.html$||')
 
 	echo "Clean up ..."
-	find -path "*.tmp" -type f -delete
+	find . -path "*.tmp" -type f -delete
 
 	echo "Copy in theme assets ..."
 	cd "$theme_path"
-	find -not -path "." -type d | while read dir_path
+	find . -not -path "." -type d | while read -r dir_path
 	do
 		new_dir=$(simplify_path "$dir_path")
 		mkdir -p "$output_folder/$new_dir"
 	done
-	find -not -path "./template.html" -type f | while read file_path
+	find . -not -path "./template.html" -type f | while read -r file_path
 	do
 		new_dir=$(dirname "$file_path")
 		new_dir=$(simplify_path "$new_dir")
@@ -443,7 +445,7 @@ function build() {
 }
 
 function serve() {
-	build --local $@
+	build --local "${@}"
 	if check_dep busybox 2> /dev/null
 	then
 		echo "Hosting with busybox on 'http://127.0.0.1:8080/${start_path_http}' (stop with Ctrl-C) ..."
@@ -468,13 +470,13 @@ case $cmd in
 		exit 0
 		;;
 	init)
-		init $@
+		init "${@}"
 		;;
 	build)
-		build $@
+		build "${@}"
 		;;
 	serve)
-		serve $@
+		serve "${@}"
 		;;
 	*)
 		echo "Unknown command '$cmd'" 1>&2
