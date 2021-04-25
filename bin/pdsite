@@ -119,8 +119,14 @@ function build(){
 
     done
 
+    if [ -f ./references.bibtex ]; then
+	usebibliography="--bibliography $(readlink -f ./references.bibtex) --csl ${scriptpath%/*}/../ieee.csl"
+    else
+	usebibliography=""
+    fi
+
     # Convert content files to context-aware HTML
-    find -path "$indexfileglob" -type f -execdir pandoc --template $themepath/template.html --toc -o index.html {} $localtree $localblock $configblock \; -delete
+    find -path "$indexfileglob" -type f -execdir pandoc $usebibliography --template $themepath/template.html --toc -o index.html {} $localtree $localblock $configblock \; -delete
 
     # Clean up
     find -path "*.tmp" -type f -delete
