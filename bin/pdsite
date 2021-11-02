@@ -36,8 +36,10 @@ function print_help() {
 
 function print_version() {
 	local ret=0
-	local git_version=$(cd "$install_path"; git describe --always --tags 2> /dev/null || true)
-	local file_version=$(cat VERSION 2> /dev/null || true)
+	local git_version
+	local file_version
+	git_version=$(cd "$install_path"; git describe --always --tags 2> /dev/null || true)
+	file_version=$(cat VERSION 2> /dev/null || true)
 	if [ -n "$git_version" ]
 	then
 		version="$git_version"
@@ -57,7 +59,8 @@ function check_dep() {
 	local ret=0
 	local cmd_name="$1"
 	local cmd_use_case="${2:-}"
-	local cmd_path=$(which "$cmd_name")
+	local cmd_path
+	cmd_path=$(which "$cmd_name")
 	if [ -z "$cmd_path" ]; then
 		ret=1
 		echo "Could not find dependency '$cmd_name', used ${cmd_use_case}." 1>&2
@@ -134,7 +137,8 @@ _set_if_unset() {
 function get_config_var() {
 	local ret=0
 	local var_name="$1"
-	local value=$(grep '^'"$var_name"':' < "$config_file" | sed 's|^'"$var_name"':\s*\(.*\)$|\1|')
+	local value
+	value=$(grep '^'"$var_name"':' < "$config_file" | sed 's|^'"$var_name"':\s*\(.*\)$|\1|')
 	[ "$value" ] || {
 		echo "Missing config variable '$var_name' in .pdsite.yml" 1>&2
 		ret=1
@@ -185,10 +189,12 @@ function navi() {
 		do
 			# Adding one path element
 			# Generate path relative to site root
-			local path="${np_prev}$(echo "${np:${#np_prev}}" | sed -e 's|\(.\)/.*|\1|')"
+			local path
+			path="${np_prev}$(echo "${np:${#np_prev}}" | sed -e 's|\(.\)/.*|\1|')"
 
 			# Generate pretty page name automatically
-			local name=$(grep "^title:" "$path/index.md" 2> /dev/null | head -n 1 | sed -E -e 's|^title:[[:space:]]*||' || echo "")
+			local name
+			name=$(grep "^title:" "$path/index.md" 2> /dev/null | head -n 1 | sed -E -e 's|^title:[[:space:]]*||' || echo "")
 			if [ -z "$name" ]
 			then
 				name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
