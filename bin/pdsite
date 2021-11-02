@@ -222,7 +222,6 @@ function navi() {
 
 function build() {
 	local build_local=false
-	link_prefix=""
 
 	while [ -n "${1:-}" ]
 	do
@@ -287,14 +286,14 @@ function build() {
 	output_folder="${output_folder:-"build"}"
 	_set_if_unset site_url ""
 	_set_if_unset site_base_path ""
-	if "$build_local" != "true"
+	if $build_local
 	then
-		link_prefix="$site_base_path"
-	else
 		# NOTE This makes the site not (fully) position independent.
 		#      The alternative woudl be, to use relative paths to the root,
 		#      calculated for each file converted with pandoc.
 		link_prefix="$output_folder"
+	else
+		link_prefix="$site_base_path"
 	fi
 
 	# Set up output folder
