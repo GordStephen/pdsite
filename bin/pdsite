@@ -200,7 +200,7 @@ function navi() {
 				name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
 			fi
 
-			local path_rtf="$(echo "$path" | sed -e 's/^\.//')"
+			local path_rtf="${path#.}"
 			local path_part=""
 			[ -n "$path_rtf" ] && path_part='"path":"'$link_prefix$path_rtf'",'
 			echo '{"type":"directory","name":"'"$name"'",'"$path_part"'"contents":['
@@ -436,7 +436,7 @@ function build() {
 			exit 1
 		fi
 	fi
-	start_path_http=$(echo "$start_path" | sed -e 's|index\.html$||')
+	start_path_http="${start_path%index.html}"
 
 	echo "Clean up ..."
 	find . -path "*.tmp" -type f -delete
