@@ -289,8 +289,7 @@ function build() {
 	if $build_local
 	then
 		# NOTE This makes the site not (fully) position independent.
-		#      The alternative woudl be, to use relative paths to the root,
-		#      calculated for each file converted with pandoc.
+		#      The alternative would be, to use relative paths to the root.
 		link_prefix="$output_folder"
 	else
 		link_prefix="$site_base_path"
