@@ -405,9 +405,13 @@ function build() {
 	do
 		dir_before="$(pwd)"
 		cd "$(dirname "$index_md")"
+		site_base_path_rel="$index_md"
+		site_base_path_rel="${site_base_path_rel#./}"
+		site_base_path_rel="${site_base_path_rel%/index.md}"
+		site_base_path_rel="$(echo "$site_base_path_rel" | sed -e 's|[^/]\+|..|g')"
 		index_md_local="$(basename "$index_md")"
 		pandoc \
-			-V site_base_path="$link_prefix" \
+			-V site_base_path="$site_base_path_rel" \
 			--template "$theme_path/template.html" \
 			--toc \
 			-o index.html \
