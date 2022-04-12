@@ -198,6 +198,9 @@ function navi() {
 			if [ -z "$name" ]
 			then
 				name=$(echo "$path" | sed 's|.*/\(.*\)|\1|' | make_pretty)
+			else
+				# Removes quotes if present
+				name="$(echo "$name" | sed -e 's|^"\(.*\)"$|\1|' -e "s|^'\(.*\)'$|\1|")"
 			fi
 
 			local path_rtf="${path#.}"
