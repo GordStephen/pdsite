@@ -1,9 +1,15 @@
-# `pdsite` ![](https://api.travis-ci.org/hoijui/pdsite.svg?branch=master)
+# pdsite
 
-... is short for "**p**an**d**oc**site**".
+![](https://api.travis-ci.org/hoijui/pdsite.svg?branch=master)
 
-It is a simplistic, single shell script, **static site generator**.
+`pdsite` is short for "**p**an**d**oc**site**".
+
+It is a simplistic, single shell script, **static site generator** (SSG).
 
 It is written in the [BASH](https://www.gnu.org/software/bash/) scripting language,
 uses the [pandoc](https://pandoc.org/) document converter
 and requires [Markdown](https://en.wikipedia.org/wiki/Markdown#Example) files as sources.
+
+While it can be used stand-alone,
+it is also used by default by the [MoVeDo](https://github.com/movedo/MoVeDo)
+documentation build system.
