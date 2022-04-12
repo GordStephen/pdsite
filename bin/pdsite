@@ -1,5 +1,10 @@
 #! /usr/bin/env bash
 
+# SPDX-FileCopyrightText: 2016-2019 Gord Stephen <gord@gordstephen.ca>
+# SPDX-FileCopyrightText: 2019-2022 Robin Vobruba <hoijui.quaero@gmail.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 # Exit immediately on each error and unset variable;
 # see: https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 set -Eeuo pipefail

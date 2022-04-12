@@ -4,6 +4,13 @@ toc: n
 pagenameintitle: n
 ...
 
+<!--
+SPDX-FileCopyrightText: 2016-2019 Gord Stephen <gord@gordstephen.ca>
+SPDX-FileCopyrightText: 2022 Robin Vobruba <hoijui.quaero@gmail.com>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # pdsite
 
 `pdsite` is a [Pandoc](http://pandoc.org/)-backed static site generator for Unix-like systems (including OSX, Linux, and BSD).

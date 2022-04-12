@@ -1,5 +1,9 @@
 # pdsite configuration
 
+# SPDX-FileCopyrightText: 2016 Gord Stephen <gord@gordstephen.ca>
+#
+# SPDX-License-Identifier: Unlicense
+
 theme: default
 inputextension: .md
 outputfolder: .html

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2020-2022 Robin Vobruba <hoijui.quaero@gmail.com>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # pdsite
 
 ![](https://api.travis-ci.org/hoijui/pdsite.svg?branch=master)

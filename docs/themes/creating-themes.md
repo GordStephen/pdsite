@@ -2,6 +2,13 @@
 title: Creating a new theme
 ---
 
+<!--
+SPDX-FileCopyrightText: 2016-2019 Gord Stephen <gord@gordstephen.ca>
+SPDX-FileCopyrightText: 2022 Robin Vobruba <hoijui.quaero@gmail.com>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 A `pdsite` theme can be as minimal as a folder containing a single `template.html` file
 that provides a [pandoc template](http://pandoc.org/README.html#using-variables-in-templates)
 for rendering HTML pages.

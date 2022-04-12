@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019-2022 Robin Vobruba <hoijui.quaero@gmail.com>
+#
+# SPDX-License-Identifier: Unlicense
+
 language: python
 
 addons:

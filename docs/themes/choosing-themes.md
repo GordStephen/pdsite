@@ -2,6 +2,13 @@
 title: Choosing a theme
 ---
 
+<!--
+SPDX-FileCopyrightText: 2016-2019 Gord Stephen <gord@gordstephen.ca>
+SPDX-FileCopyrightText: 2022 Robin Vobruba <hoijui.quaero@gmail.com>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 ## Building with an installed theme
 
 Setting the theme to be used during HTML generation is as simple as setting the `theme` variable in `.pdsite.yml`.

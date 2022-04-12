@@ -2,6 +2,13 @@
 title: Installing
 ---
 
+<!--
+SPDX-FileCopyrightText: 2016-2019 Gord Stephen <gord@gordstephen.ca>
+SPDX-FileCopyrightText: 2022 Robin Vobruba <hoijui.quaero@gmail.com>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 ### Dependencies
 
 `pdsite` aims to keep its dependencies short and simple.
@@ -9,6 +16,7 @@ The complete list is:
 
 - [pandoc](http://pandoc.org/) -
   for all the heavy lifting
+- []
 - [busybox](https://www.busybox.net/) (optional, usually pre-installed) -
   for local HTTP hosting of the the site after building
 

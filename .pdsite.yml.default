@@ -1,5 +1,10 @@
 # pdsite configuration
 
+# SPDX-FileCopyrightText: 2016 Gord Stephen <gord@gordstephen.ca>
+# SPDX-FileCopyrightText: 2019 Robin Vobruba <hoijui.quaero@gmail.com>
+#
+# SPDX-License-Identifier: Unlicense
+
 theme: default
 inputextension: .md
 outputfolder: .html
