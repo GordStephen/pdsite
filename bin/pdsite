@@ -437,7 +437,7 @@ function build() {
 
 	echo "Check if site has a usable structure ..."
 	start_path="index.html"
-	if [ ! -e "${output_folder}/$start_path" ]; then
+	if [ ! -e "$output_folder/$start_path" ]; then
 		echo "WARNING: There is no index.html in the web-site root folder." 1>&2
 		# Choose an arbitrary *.html file from our output as start path
 		start_path=$(cd "$output_folder"; find . -regex "\./.+\.html" | sort | head -n 1 | sed -e 's|^\./||')
