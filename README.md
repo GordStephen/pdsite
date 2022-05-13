@@ -20,7 +20,8 @@ It is a simplistic, single shell script, **static site generator** (SSG).
 
 It is written in the [BASH](https://www.gnu.org/software/bash/) scripting language,
 uses the [pandoc](https://pandoc.org/) document converter
-and requires [Markdown](https://en.wikipedia.org/wiki/Markdown#Example) files as sources.
+and requires [Markdown](https://en.wikipedia.org/wiki/Markdown#Example) files
+as sources.
 
 While it can be used stand-alone,
 it is also used by default by the [MoVeDo](https://github.com/movedo/MoVeDo)
