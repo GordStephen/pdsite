@@ -407,6 +407,20 @@ function build() {
 		sed 's|"path":"'"$site_path_abs"'",|\0"active":y,|' "$global_tree" > "$relpath/$local_tree"
 	done
 
+	# This meta-data file is used for each markdown file to be converted,
+	# but only during conversion.
+	# We need this, as it is not possible to supply a YAML array
+	# with "-M" to pandoc, which we require for "panflute-filters".
+	common_meta_file="$(mktemp --suffix=".yml")"
+	# Remove this file when script exits
+	trap 'rm -rf -- "$common_meta_file"' EXIT
+	{
+		echo "panflute-path: \"$filters_path\""
+		echo "panflute-filters: [add_local_link_prefix, replace_link_suffixes]"
+		# Uncomment this next line for debugging
+		# echo "panflute-verbose: true"
+	} > "$common_meta_file"
+
 	echo "Convert content files to context-aware HTML ..."
 	find . -not -path "${output_folder}*" -path "$index_file_glob" -type f \
 		| while read -r index_md
@@ -425,11 +439,11 @@ function build() {
 			-o index.html \
 			-M allp_prefix="../" \
 			-M allp_file="$index_md_local" \
-			--filter "$filters_path/add_local_link_prefix.py" \
 			-M rls_relative_only=True \
 			-M rls_ext_from=".md" \
 			-M rls_ext_to=".html" \
-			--filter "$filters_path/replace_link_suffixes.py" \
+			--metadata-file="$common_meta_file" \
+			-F panflute \
 			"$index_md_local" "$local_tree" "$local_block" "$config_block"
 		cd "$dir_before"
 		rm "$index_md"
