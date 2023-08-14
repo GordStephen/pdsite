@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+
+<!--
+SPDX-FileCopyrightText: 2016 Gord Stephen <gord@gordstephen.ca>
+SPDX-FileCopyrightText: 2022 Robin Vobruba <hoijui.quaero@gmail.com>
+
+SPDX-License-Identifier: Unlicense
+-->
+
 <html$if(lang)$ lang="$lang$"$endif$$if(dir)$ dir="$dir$"$endif$>
 <head>
   <meta charset="utf-8">
@@ -28,7 +36,7 @@ $if(bootswatch)$
 $else$
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 $endif$
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="$site_base_path$/styles.css">
 $if(math)$
   $math$
 $endif$
@@ -88,11 +96,11 @@ $endif$
 
     <div class="container">
       $if(title)$
-      <div class="page-header"><h1>$title$$if(subtitle)$<small>$subtitle$</small>$endif$</h1></div>
+      <div class="page-header"><h1>$title$</h1>$if(subtitle)$<br/><h2>$subtitle$</h2>$endif$</div>
       $endif$
 	<div class="row">
 	    <div class="col-md-9">
-		$body$
+$body$
 	    </div>
 	    $if(toc)$
 	    <div class="col-md-3">
@@ -102,7 +110,7 @@ $endif$
 	      </nav>
 	    </div>
 	    $endif$
-	</div>        
+	</div>
     </div>
 
     <nav class="navbar navbar-default navbar-static-bottom">

@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Robin Vobruba <hoijui.quaero@gmail.com>
+#
+# SPDX-License-Identifier: Unlicense
+
+bs4==0.0.1
+panflute==1.11.2
+wheel==0.33.6

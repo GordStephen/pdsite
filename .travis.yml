@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2019-2022 Robin Vobruba <hoijui.quaero@gmail.com>
+#
+# SPDX-License-Identifier: Unlicense
+
+language: python
+
+addons:
+  apt:
+    packages:
+    - pandoc
+    - python3-setuptools
+    - texlive-latex-base
+
+before_script:
+  - python --version
+  - pip install -r requirements.txt
+
+script:
+  - cd docs
+  - ../bin/pdsite build
+
